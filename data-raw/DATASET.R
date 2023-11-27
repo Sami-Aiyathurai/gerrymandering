@@ -1,3 +1,4 @@
+
 library(tidyverse)
 library(openintro)
 
@@ -41,3 +42,8 @@ view(sen_general)
 # make new df where there is statewide info
 # presidential, senatorial sums go here
 # congressional sums go here as well
+
+## code to prepare `DATASET` dataset goes here
+
+usethis::use_data(DATASET, overwrite = TRUE)
+
