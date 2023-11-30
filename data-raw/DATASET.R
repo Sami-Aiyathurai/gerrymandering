@@ -1,5 +1,4 @@
 library(tidyverse)
-library(openintro)
 
 sen_2022 <- read.csv("senate_2022.csv")
 sen_general <- read.csv("1976-2020-senate.csv")
@@ -22,25 +21,28 @@ house_general <- house_general %>%
   filter(year >= 2000) %>%
   select(year, state, office, district, candidate, party, candidatevotes, totalvotes)
 
+# nested loop for each state then each district in each state
+
 for (district in house_general) {
   house_general$contest_dem <- ifelse(house_general$party == "DEMOCRAT", 1, 0)
   house_general$contest_rep <- ifelse(house_general$party == "REPUBLICAN", 1, 0)
 }
 
+# don't forget Minnesota
+# LA
+#once you get to 2018 I think then WA and CA have top 2 general elections
+# AK in 2020 did Ranked choice voting
+
+
+
 # this loop doesn't work but we need to create some sort of function like this that is gonna go into the data and tally up 2 party vote
-for (district in house_general) {
-  if (house_general$contest_dem == 1 & house_general$contest_rep == 1) {
-    if (house_general$party == "DEMOCRAT") {
-      house_general$state_demvotes == candidatevotes
-    }
-    if (house_general$party == "REPUBLICAN") {
-      house_general$state_repvotes == candidatevotes
-    }
-  }
+
+for (s in house_general$state){
+  temp <- subset(house_general, state == s)
+  assign(paste0('house_general_', s), temp)
 }
 
 # need to build in some sort of thing because in Minnesota Dems are Democratic-farmer-labor not just dem
-
 
 
 # filter to be 2000-2022
