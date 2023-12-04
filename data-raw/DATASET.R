@@ -1,10 +1,9 @@
-
 library(tidyverse)
 
-sen_2022 <- read.csv("senate_2022.csv")
-sen_general <- read.csv("1976-2020-senate.csv")
-house_general <- read.csv("1976-2022-house (1).csv")
-pres_general <- read.csv("countypres_2000-2020.csv")
+sen_2022 <- read.csv("data-raw/senate_2022.csv")
+sen_general <- read.csv("data-raw/1976-2020-senate.csv")
+house_general <- read.csv("data-raw/1976-2022-house.csv")
+pres_general <- read.csv("data-raw/countypres_2000-2020.csv")
 
 # Presidential -- Mia
 
