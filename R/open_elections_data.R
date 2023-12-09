@@ -1,4 +1,4 @@
-url <- file.path("https://xkcd.com" , number , "info.0.json")
+#url <- file.path("https://xkcd.com" , number , "info.0.json")
 
 #get data using changing urls like with xkcd
 #read data/make dataframe using techniques from dengue fever
@@ -60,8 +60,26 @@ open_elections_factory <- function(dates) {
     }
 }
 
+ward_open_elections_factory <- function(dates) {
+
+  read <- function(year){
+    date <- dates[year]
+    temp <- paste(date,"__wi__general__ward.csv", sep = "")
+    url <- file.path("https://raw.githubusercontent.com/openelections/openelections-data-wi/master" , year, temp)
+    data <- read.csv(url)
+    for (district in data) {
+      data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
+      data$contest_rep <- ifelse(data$party == "REP", 1, 0)
+      data$year <- as.numeric(year) # need to create this because it doesn't save year as variable bc each set is separate
+    }
+    data
+  }
+}
+
+
+
 # offices we care about: President, State Attorney General, State Assembly, State Senate, Senate, House
-oe_data_WI <- open_elections_factory(
+oe_data_WI <- ward_open_elections_factory(
   dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
 )
 #ask whopper or grace for way to automate
