@@ -1,41 +1,5 @@
-ward_open_elections_factory <- function(dates) {
+##This section is Molly's code, my (Mia's) job is to automate it/make it a function factory
 
-  read <- function(year){
-    date <- dates[year]
-    temp <- paste(date,"__wi__general__ward.csv", sep = "")
-    url <- file.path("https://raw.githubusercontent.com/openelections/openelections-data-wi/master" , year, temp)
-    base_data <- read.csv(url)
-
-    for (district in base_data) {
-      base_data$contest_dem <- ifelse(base_data$party == "DEM", 1, 0)
-      base_data$contest_rep <- ifelse(base_data$party == "REP", 1, 0)
-      base_data$year <- as.numeric(year) # need to create this because it doesn't save year as variable bc each set is separate
-    }
-    base_data
-  }
-}
-# this creates a massive list of all the data, to access any one year you [[i]]
-years <- as.character(c("2000", "2002", "2004", "2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"))
-
-everything <- map(.x=years, .f=oe_data_WI)
-
-# offices we care about: President, State Attorney General, State Assembly, State Senate, Senate, House
-oe_data_WI <- ward_open_elections_factory(
-  dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
-)
-#ask whopper or grace for way to automate
-wi_2000 <- oe_data_WI("2000")
-wi_2002 <- oe_data_WI("2002")
-wi_2004 <- oe_data_WI("2004")
-wi_2006 <- oe_data_WI("2006")
-wi_2008 <- oe_data_WI("2008")
-wi_2010 <- oe_data_WI("2010")
-wi_2012 <- oe_data_WI("2012")
-wi_2014 <- oe_data_WI("2014")
-wi_2016 <- oe_data_WI("2016")
-wi_2018 <- oe_data_WI("2018")
-wi_2020 <- oe_data_WI("2020")
-wi_2022 <- oe_data_WI("2022")
 
 
 
@@ -46,9 +10,9 @@ filter_statewide <- function(x) {
   #x <- x[-c(1, 5:6)]
   return(x)
 }
+
 statewide_2000 <- filter_statewide(wi_2000) # only statewide offices for 2000
-statewide_2002 <- filter_statewide(wi_2002) # only statewide offices for 2002
-statewide_2006 <- filter_statewide(wi_2006)
+statewide_2002 <- filter_statewide(wi_2002) # only statewide offices for 2000
 
 total_vote_func <- function(x) {
   x %>%
@@ -58,7 +22,6 @@ total_vote_func <- function(x) {
 
 tv_2000 <- total_vote_func(statewide_2000) # total votes cast for each candidate STATEWIDE
 tv_2002 <- total_vote_func(statewide_2002)
-tv_2006 <- total_vote_func(statewide_2006)
 
 total_2p_vote_func <- function(x) {
   x %>%
@@ -69,22 +32,16 @@ total_2p_vote_func <- function(x) {
 
 tv_2p_2000 <- total_2p_vote_func(statewide_2000)
 tv_2p_2002 <- total_2p_vote_func(statewide_2002)
-tv_2p_2006 <- total_2p_vote_func(statewide_2006)
 
 # joining the two party votes and the total votes statewide to the statewide data
 
-vote_join <- function(x, y, z) {
-  x <- x %>%
-    left_join(y, by = "office") %>%
-    left_join(z, by = "office")
-  return(x)
-}
+statewide_2000 <- statewide_2000 %>%
+  left_join(tv_2000, by = "office") %>%
+  left_join(tv_2p_2000, by = "office")
 
-statewide_2000 <- vote_join(statewide_2000, tv_2000, tv_2p_2000)
-statewide_2002 <- vote_join(statewide_2002, tv_2000, tv_2p_2002)
-statewide_2006 <- vote_join(statewide_2006, tv_2000, tv_2p_2006)
-
-# joining the two party votes and the total votes statewide to the statewide data
+statewide_2002 <- statewide_2002 %>%
+  left_join(tv_2002, by = "office") %>%
+  left_join(tv_2p_2002, by = "office")
 
 # but we don't want to remove other parties YET
 
@@ -108,6 +65,23 @@ statewide_2006 <- vote_join(statewide_2006, tv_2000, tv_2p_2006)
 
 # this function doesn't work yet but I started messing around with it
 
+congress_votes <- function(x) { # the purpose of this function is to arrange all of the vote getting data in one func
+  xh <- x %>%
+    filter(office == "House")
+  for (i in xh) {
+    xh_1 <- xh %>%
+      filter(district == i)
+    xh_1tv <- tv_func(xh_1)
+    xh_12p <- tv_func_2p(xh_1)
+    xh_1 <- xh_1 %>%
+      left_join(xh_1tv, by = "office") %>%
+      left_join(xh_12p, by = "office") %>%
+      filter(party == "DEM" | party == "REP")
+    return(xh_1) # I don't think my return statements are accurate here, I think I'm missing a step
+  }
+  return(xh_1)
+}
+
 # below are the steps I took to isolate the house district info
 
 house_2000 <- wi_2000 %>%
@@ -116,70 +90,6 @@ house_2000 <- wi_2000 %>%
 # for the first district (nb: here it is contested)
 house_1_2000 <- house_2000 %>%
   filter(district == 1)
-
-check_districts <- function(x) {
-  ndis <- as.integer(unique(x$district))
-  return(ndis)
-}
-
-cd <- check_districts(house_2000)
-
-candidate_function <- function(x, ...) {
-  cand_x_year <- x %>%
-    group_by(candidate) %>%
-    summarize(cand_total_votes = sum(votes))
-  x <- x %>%
-    left_join(cand_x_year, by = "candidate") %>%
-    mutate(prop = cand_total_votes/total_votes_2p)
-  return(x)
-}
-
-# for the first district (nb: here it is contested)
-house_1_2000 <- house_2000 %>%
-  filter(district == 1)
-
-house_1_2002 <- house_2002 %>%
-  filter(district == 1)
-
-t2 <- map(.x=check_districts(house_2000), .f=house_district_func())
-
-filter_district <- function(x) {
-  single_dis <- x %>%
-    filter(district == 1)
-  return(single_dis)
-}
-
-d2 <- filter_district(house_2000)
-
-house_district_func <- function(x, y,...) {
-  tv_hx_year <- total_vote_func(x)
-  tv2p_hx_year <- total_2p_vote_func(x)
-  hx_year <- vote_join(x, tv_hx_year, tv2p_hx_year) %>%
-    filter(party == "DEM" | party == "REP")
-  wards_hx_year <- data.frame(ward = check_wards(x))
-  statewide_x_year <- y %>%
-    right_join(wards_hx_year, by = "ward")
-  statewide_x_year <- statewide_x_year[-(12:13)]
-  tv_statewide_x_year <- total_vote_func(statewide_x_year)
-  tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
-  statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
-    filter(party == "DEM" | party == "REP")
-  district_x_year <- rbind(statewide_x_year, hx_year)
-  district_x_year <- candidate_function(district_x_year)
-}
-
-mother <- function(x, y,...) {
-  dis <- filter_district(x) %>%
-    house_district_func(y)
-  return(dis)
-}
-
-m1 <- mother(x=house_2000, y=statewide_2000)
-
-
-test <- house_district_func(house_1_2000, statewide_2000)
-
-
 
 tv_house1_2000 <- total_vote_func(house_1_2000) # get total votes cast
 tv2p_house1_2000 <- total_2p_vote_func(house_1_2000) # 2 party vote totals
@@ -213,7 +123,7 @@ statewide_1_2000 <- statewide_1_2000 %>%
   left_join(tv2p_statewide_1_2000, by = "office") %>%
   filter(party == "DEM" | party == "REP")
 
-district_1_2000 <- rbind(statewide_district_1, house_1_2000) # now in one DF we have for the 1st Cong district of WI in 2000 how they voted for
+district_1_2000 <- rbind(statewide_1_2000, house_1_2000) # now in one DF we have for the 1st Cong district of WI in 2000 how they voted for
 # president, senate, and the house!
 
 cand_2000_1 <- district_1_2000 %>%
@@ -404,4 +314,3 @@ empty_offices <- list(office = c("Attorney General", "Governor", "President",
                       total_votes = vector(mode="numeric", length=5))
 
 head(tv_2000)
-
