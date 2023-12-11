@@ -34,7 +34,7 @@ url <- file.path("https://xkcd.com" , number , "info.0.json")
 # https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2022/20221108__mi__general__precinct.csv
 
 
-readhttps://raw.githubusercontent.com/openelections/openelections-data-wi/master/2016/20161108__wi__general__ward.csv
+#readhttps://raw.githubusercontent.com/openelections/openelections-data-wi/master/2016/20161108__wi__general__ward.csv
 
 
 data_WI <- function(year, date){
