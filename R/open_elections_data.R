@@ -17,48 +17,70 @@
 # https://raw.githubusercontent.com/openelections/openelections-data-wi/master/2020/20201103__wi__general__ward.csv
 # https://raw.githubusercontent.com/openelections/openelections-data-wi/master/2022/20221108__wi__general__ward.csv
 
+#URLs MI
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2000/20001107__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2002/20021105__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2004/20041102__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2006/20061107__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2008/20081104__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2010/20101102__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2012/20121106__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2014/20141104__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2016/20161108__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2018/20181106__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2020/20201103__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2022/20221108__mi__general__precinct.csv
 
-data_WI <- function(year, date){
-  temp <- paste(date,"__wi__general__ward.csv", sep = "")
-  url <- file.path("https://raw.githubusercontent.com/openelections/openelections-data-wi/master" , year, temp)
-  base_data <- read.csv(url)
-  data <- base_data %>%
-    group_by(district, office, party) %>%
-    summarize(cand_votes = sum(votes))
 
-  for (district in data) {
-    data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
-    data$contest_rep <- ifelse(data$party == "REP", 1, 0)
-    data$year <- as.numeric(year) # need to create this because it doesn't save year as variable bc each set is separate
+#readhttps://raw.githubusercontent.com/openelections/openelections-data-wi/master/2016/20161108__wi__general__ward.csv
+
+
+open_elections_factory <- function(state) {
+  dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
+  temp1 <-paste("https://raw.githubusercontent.com/openelections/openelections-data-",state,"/master", sep = "")
+  if (state == "mi"){
+  temp2 <- paste("__",state,"__general__precinct.csv", sep = "")
+  }else {
+  temp2 <- paste("__",state,"__general__ward.csv", sep = "")
   }
-  data
-}
-
-test_wi <- data_WI(2000, 20001107)
-
-
-
-
-
-open_elections_factory <- function(dates) {
 
   read <- function(year){
-      date <- dates[year]
-      temp <- paste(date,"__wi__general__ward.csv", sep = "")
-      url <- file.path("https://raw.githubusercontent.com/openelections/openelections-data-wi/master" , year, temp)
-      base_data <- read.csv(url)
-      data <- base_data %>%
-        group_by(district, office, party) %>%
-        summarize(cand_votes = sum(votes))
-
+    date <- dates[year]
+    temp3 <- paste(date,temp2, sep = "")
+    url <- file.path(temp1 , year, temp3)
+    data <- read.csv(url)
       for (district in data) {
-        data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
-        data$contest_rep <- ifelse(data$party == "REP", 1, 0)
-        data$year <- as.numeric(year) # need to create this because it doesn't save year as variable bc each set is separate
+      data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
+      data$contest_rep <- ifelse(data$party == "REP", 1, 0)
+      data$year <- as.numeric(year) # need to create this because it doesn't save year as variable bc each set is separate
       }
-      data
-    }
+    data
+  }
 }
+
+oe_data_WI <- open_elections_factory("wi")
+oe_data_MI <- open_elections_factory("mi")
+
+generate_data <- function(){
+  dfs_wi <- list()
+  dfs_mi <- list()
+    for(i in seq(2000, 2020, 2)){
+    year <- toString(i)
+    dfs_wi[[year]] <- oe_data_WI(year)
+    dfs_mi[[year]] <- oe_data_MI(year)
+    }
+  dfs <- list()
+  dfs[["wi"]] <- dfs_wi
+  dfs[["mi"]] <- dfs_mi
+  return(dfs)
+}
+state_data <- generate_data()
+View(state_data)
+View(state_data[["wi"]][["2000"]])
+
+
+
+#ward elections code molly and mia made
 
 ward_open_elections_factory <- function(dates) {
 
