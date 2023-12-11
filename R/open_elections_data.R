@@ -17,6 +17,24 @@
 # https://raw.githubusercontent.com/openelections/openelections-data-wi/master/2020/20201103__wi__general__ward.csv
 # https://raw.githubusercontent.com/openelections/openelections-data-wi/master/2022/20221108__wi__general__ward.csv
 
+#URLs MI
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2000/20001107__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2002/20021105__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2004/20041102__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2006/20061107__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2008/20081104__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2010/20101102__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2012/20121106__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2014/20141104__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2016/20161108__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2018/20181106__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2020/20201103__mi__general__precinct.csv
+# https://raw.githubusercontent.com/openelections/openelections-data-mi/master/2022/20221108__mi__general__precinct.csv
+
+
+#readhttps://raw.githubusercontent.com/openelections/openelections-data-wi/master/2016/20161108__wi__general__ward.csv
+
+
 
 data_WI <- function(year, date){
   temp <- paste(date,"__wi__general__ward.csv", sep = "")
