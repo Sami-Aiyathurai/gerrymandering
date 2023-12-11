@@ -78,12 +78,30 @@ statewide_modifer <- function(x, ...){
   return(x)
 }
 
-wi_2000_statewide_mod <- statewide_modifer(wi_2000)
-wi_2002_statewide_mod <- statewide_modifer(wi_2002)
-
 everything_statewide <- map(.x=everything, .f=statewide_modifer)
 
-#Use similar function to map to isolate house district info, data frames for all district - return an individuall
+filter_house <- function(x, ...) {
+  x <- x %>%
+    filter(office == "House")
+  return(x)
+}
+
+district_separator <- function(x, ...){
+  districts <- unique(x$district)
+  for (i in vector) {
+    x_i <- x %>%
+      filter(district == i)
+    return(x)
+  }
+}
+
+everything_house <- map(.x =everything, .f=filter_house)
+
+house_district_separator <- function(x){
+
+}
+
+#Use similar function to map to isolate house district info, data frames for all district - return an individual
 
 #filter out office as house, break out each district into its own data frame
 
