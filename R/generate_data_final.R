@@ -61,6 +61,7 @@ generate_data <- function(){
 #' Note that many of the fields may be an empty string
 #'
 #' @import tidyverse
+#' @export
 
 
 
