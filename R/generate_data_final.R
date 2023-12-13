@@ -1,3 +1,4 @@
+#' @export
 open_elections_factory <- function(state) {
   dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
   temp1 <-paste("https://raw.githubusercontent.com/openelections/openelections-data-",state,"/master", sep = "")
@@ -20,9 +21,13 @@ open_elections_factory <- function(state) {
     data
   }
 }
-
+#' @export
 oe_data_WI <- open_elections_factory("wi")
+
+#' @export
 oe_data_MI <- open_elections_factory("mi")
+
+#' @export
 
 generate_data <- function(){
   dfs_wi <- list()
