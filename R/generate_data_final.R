@@ -43,6 +43,9 @@ generate_data <- function(){
   return(dfs)
 }
 
+#' @export
+data <- generate_data()
+
 #' Retrieves election data for Michigan and Wisconsin from the years 2000-2020
 #'
 #' If given either Michigan or Wisconsin and a year, this function returns all
@@ -69,19 +72,8 @@ generate_data <- function(){
 #' @export
 
 
-
-access_state_year <- function(state, year){
-  data <- generate_data()
+access_state_year <- function(state, year, data){
   state_year <- data[[state]][[year]]
   return(state_year)
 }
-
-
-
-
-
-
-
-
-
 
