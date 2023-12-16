@@ -27,7 +27,7 @@ everything <- map(.x=years, .f=oe_data_WI)
 oe_data_WI <- ward_open_elections_factory(
   dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
 )
-#ask whopper or grace for way to automate
+#ask whopper or grace for way to automate (can I delete this bit?)
 wi_2000 <- oe_data_WI("2000")
 wi_2002 <- oe_data_WI("2002")
 wi_2004 <- oe_data_WI("2004")
@@ -80,24 +80,78 @@ statewide_modifer <- function(x, ...){
 
 everything_statewide <- map(.x=everything, .f=statewide_modifer)
 
+#Automating the code for the house data
+
 filter_house <- function(x, ...) {
   x <- x %>%
     filter(office == "House")
   return(x)
 }
 
+house_district_filter <- function(x, dis_num, ...){
+  y <- x %>%
+    filter(district == dis_num)
+  return(y)
+}
+
+#Do I have to make a function factory here to get this to work???? You know what I might just do it for all 1-9 temporarily
+
+
+
+all_district <- function(x, ...){
+  districts <- unique(x$district)
+  a <- length(districts)
+
+  z <- for (i in 1:a){
+    house_district_filter(x, i, ...)
+  }
+  return(z)
+}
+
+all_district(wi_2000_h)
+
+all_district_2 <- function(x, ...){
+  districts <- unique(x$district)
+  z <- map()
+  return(z)
+}
+
+all_district_2(wi_2000_h)
+
+wi_2000_h <- filter_house(wi_2000)
+district <- unique(wi_2000_h$district)
+
+house_district_filter(wi_2000_h, 1)
+
+map2()
+
+district_loop <- for (i in vector) {
+  y <- x %>%
+    filter(district == i)
+  return(y)
+}
+
 district_separator <- function(x, ...){
   districts <- unique(x$district)
-  for (i in vector) {
-    x_i <- x %>%
-      filter(district == i)
-    return(x)
-  }
+
+  return(districts)
+}
+
+district_separator(wi_2000_h)
+
+vector("list", everything_statewide)
+
+districts <- unique(everything[[district]])
+for (i in everything) {
+  x_i <- x %>%
+    filter(district == i)
+  return(x)
 }
 
 everything_house <- map(.x =everything, .f=filter_house)
 
-house_district_separator <- function(x){
+house_district_separator <- function(x, ...){
+  x <- filter_house(x)
 
 }
 
