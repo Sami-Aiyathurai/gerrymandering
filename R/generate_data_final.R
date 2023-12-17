@@ -21,6 +21,7 @@ open_elections_factory <- function(state) {
     data
   }
 }
+
 #' @export
 oe_data_WI <- open_elections_factory("wi")
 
