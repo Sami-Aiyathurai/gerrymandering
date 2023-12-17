@@ -9,7 +9,7 @@ contest_di <- function(year_data){
   for (district in di_data_sa) {
     di_data_sa$contested <- ifelse((di_data_sa$contest_d == 0) | (di_data_sa$contest_r == 0), "uncontested", "contested")
   }
-  sa_di <- sa_data %>% left_join(di_data_sa, by=c('district'))
+  full_sa_di <- sa_data %>% left_join(di_data_sa, by=c('district'))
 
   return(full_sa_di)
 }

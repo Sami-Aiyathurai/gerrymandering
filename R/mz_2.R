@@ -20,16 +20,18 @@ filter_statewide <- function(x) {
 }
 
 total_vote_func <- function(x) {
-  x %>%
+  x <- x %>%
     group_by(office) %>%
     summarize(total_votes = sum(votes))
+  return(x)
 }
 
 total_2p_vote_func <- function(x) {
-  x %>%
+  x <- x %>%
     filter(party == "DEM" | party == "REP") %>%
     group_by(office) %>%
     summarize(total_votes_2p = sum(votes))
+  return(x)
 }
 
 vote_join <- function(x, y, z) {
@@ -107,25 +109,25 @@ check_wards <- function(x) {
 }
 
 district_func <- function(x, y,...) { # binds together the district based race with the statewide races
-  tv_hx_year <- total_vote_func(x)
-  tv2p_hx_year <- total_2p_vote_func(x)
-  hx_year <- vote_join(x, tv_hx_year, tv2p_hx_year) %>%
+  tv_sax_year <- total_vote_func(x)
+  tv2p_sax_year <- total_2p_vote_func(x)
+  sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
     filter(party == "DEM" | party == "REP")
-  wards_hx_year <- data.frame(ward = check_wards(x)) # pulls the wards from the district we're looking at
+  wards_sax_year <- data.frame(ward = check_wards(x)) # pulls the wards from the district we're looking at
   statewide_x_year <- y %>%
-    right_join(wards_hx_year, by = "ward") # joins the wards to the statewide data to isolate wards we want
+    right_join(wards_sax_year, by = "ward") # joins the wards to the statewide data to isolate wards we want
   statewide_x_year <- statewide_x_year[-(12:13)] # removes the total votes columns bc they're for statewide
   tv_statewide_x_year <- total_vote_func(statewide_x_year) # now we're pulling info for that district
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     filter(party == "DEM" | party == "REP")
-  district_x_year <- rbind(statewide_x_year, hx_year)
+  district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year) # now we're getting candidate vote totals, props for each district
 }
 
-joining <- function(x, y,...) {
+joining <- function(x, y,...) { # x is sa_2010, y=statewide_2010
   dis <- filter_district(x) %>% # we're filtering the state assembly data for district in question
-    house_district_func(y)
+    district_func(x, y)
   return(dis)
 }
 
@@ -152,7 +154,7 @@ base_sa3 <- baseline_sa3 %>% # produces candidate vote totals for the district
 base_sa3_mod <- base_sa3 %>%
   right_join(base_sa3dem, by = c("DEM", "REP", "office",
                                  "total_votes_2p", "cand_total_votes", "year")) %>%
-  arrange(REP) # tbh I can'd remember why I did this
+  arrange(REP) # tbh I can't remember why I did this
 
 base_sa3_mod <- base_sa3_mod[-1,] # removes the highest dem percent (senate 2006)
 
