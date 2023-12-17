@@ -54,13 +54,13 @@ candidate_function(sa_3_2010)
 
 mother3 <- function(x, y,...) {
   dis <- filter_district3(x) %>%
-    house_district_func(y)
+    district_func(y)
   return(dis)
 }
 
-m2010_3 <- mother3(x=sa_2010, y=statewide_2010)
-m2008_3 <- mother3(x=sa_2008, y=statewide_2008)
-m2006_3 <- mother3(x=sa_2006, y=statewide_2006)
+m2010_3 <- mother3(x=sa_3_2010, y=statewide_2010)
+m2008_3 <- mother3(x=sa_3_2008, y=statewide_2008)
+m2006_3 <- mother3(x=sa_3_2006, y=statewide_2006)
 # nb. SA3 was contested in 2006, 2008, but not in 2010
 
 baseline_sa3 <- rbind(m2010_3, m2008_3, m2006_3) # gets all the info in one place
