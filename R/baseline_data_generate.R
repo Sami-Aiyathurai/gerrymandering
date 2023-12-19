@@ -67,72 +67,12 @@ dis_baseline_ve <- function(dis_num, data){
   return(ve)
 }
 
+# The functions, when called and saved to an object, return a dataframe with the estimated vote shares in that
+# year for the state and the ACTUAL vote shares in contested districts!!
 
-#this leaves me with data from three years for all uncontested districts in 2010
-testing1 <- year_baseline_data(2010)
+# include message = false call perhaps
 
-# now testing1 returns the dataframe with the values where we want them!!
-
-prep_contested <- function(year) {
-  year <- as.character(year)
-  year_data <- wi_full_sa_di[[year]]
-
-}
-
-total_vote_func <- function(x) {
-  x <- x %>%
-    group_by(office) %>%
-    summarize(total_votes = sum(votes))
-  return(x)
-}
-
-total_2p_vote_func <- function(x) {
-  x <- x %>%
-    filter(party == "DEM" | party == "REP") %>%
-    group_by(office) %>%
-    summarize(total_votes_2p = sum(votes))
-  return(x)
-}
-
-sa_1_2010 <- sa_2010 %>%
-  filter(district == 1) %>%
-  group_by(party, district) %>%
-  summarize(cand_total_votes = sum(votes),
-            total_2p_votes = sum(total.votes)) %>%
-  mutate(prop = cand_total_votes/total_2p_votes) %>%
-  pivot_wider(names_from = "party", values_from = "prop") %>%
-
-
-sa_2010 <- wi_full_sa_di[["2010"]] %>%
-  filter(contested == "contested") %>%
-  group_by(office, year, party, district) %>%
-  summarize(total_votes_2p = mean(total_2p_vote_func(votes)),
-            cand_total_votes = candidate_function(votes),
-            prop=mean(prop))
-  pivot_wider(names_from = "party", values_from = prop)
-
-head(sa_2010)
-
-sa_2010 %>%
-
-  group_by(office, district, party) %>%
-  summarize(cand_votes = sum(votes))
-
-sa_2010_ <- sa_2010 %>%
-  group_by("office, district, party") %>%
-  summarize(total_votes = sum(total.votes))
-
-
-## None of this below works and that's okay
-#this works on a district basis
-#get baselines for district 3 and district 8
-base_sa3 <- baseline_function(testing1[["3"]])
-base_sa8 <- baseline_function(testing1[["8"]])
-#trim baselines
-trim_sa3 <- slicing_func(base_sa3)
-trim_sa8 <- slicing_func(base_sa8)
-#who knows
-trimmed_sa3 <- trimmed_func(trim_sa3, 3)
-trimmed_sa8 <- trimmed_func(trim_sa8, 8)
-
-
+votes_2010 <- year_baseline_data(2010)
+# for some reason 2012 isn't working
+votes_2014 <- year_baseline_data(2014)
+votes_2016 <- year_baseline_data(2016)
