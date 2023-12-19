@@ -8,9 +8,24 @@
 #SA: seat share of party A (Democrat)
 #S: total congressional seats
 
+
+## Calculating Efficiency Gap for 2010 and 2016 for State Assembly Districts
+
+## Using Presidential Data
+
+Rseats2010 <- as.numeric(60)
+Dseats2010 <- as.numeric(38)
+Tseats <- as.numeric(99)
+
+## Using aggregated statewide race data
+
+## Using only (estimated) state assembly data
+
+## Using ALL
+
+
 # Calculating EG for WI_2000
 
-# I don't think the numbers here are actually accurate
 
 st <- statewide_2000 %>%
   filter(party == "DEM" | party == "REP") %>%
