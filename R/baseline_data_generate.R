@@ -25,6 +25,19 @@ year_baseline_data <- function(year) {
   statewide_main_minus_two <- statewide_master(main_minus_two)
   statewide_main_minus_four <- statewide_master(main_minus_four)
 
+  contested_main_year <- main_year %>% filter(contested == "contested")
+  con_districts_main_year <- check_districts(contested_main_year)
+
+  for (i in con_districts_main_year) {
+    temp <- contested_main_year %>%
+      filter(district == i) %>%
+      group_by(district, party, contested) %>%
+      summarize(cand_votes = sum(votes)) %>%
+      pivot_wider(names_from = "party", values_from = cand_votes) %>%
+      select(district, DEM, REP, contested)
+    districts_full[i, ] <- temp
+  }
+
   un_districts_main_year <- check_districts(uncon_main_year)
   # empty list to store data for year
   districts <- list()
@@ -41,9 +54,9 @@ year_baseline_data <- function(year) {
     mainyearminus4 <- district_func(temp, statewide_main_minus_four)
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
     districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
-    districts_2p[i, ] <- districts[[dis_name]][["estimates"]]
+    districts_full[i, ] <- districts[[dis_name]][["estimates"]]
     }
-  return(districts_2p)
+  return(districts_full)
 }
 
 dis_baseline_ve <- function(dis_num, data){

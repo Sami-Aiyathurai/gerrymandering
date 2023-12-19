@@ -11,11 +11,77 @@
 
 ## Calculating Efficiency Gap for 2010 and 2016 for State Assembly Districts
 
+# Goal: show the difference between calculating with just presidency, statewide info, and
+
+# Wisconsin State Assembly Composition in 2010: 38 D / 61 R (technically 60 but there's
+# one Independent who caucused with the Republicans so I'm counting it as a REP)
+
+## Now we can take our data and find Efficiency Gap for the requested year
+
+vote_prep <- function(full_votes) {
+  total_votes <- full_votes %>%
+    group_by(District) %>%
+    summarize(total_votes = sum(Dem_votes, Rep_votes))
+
+  full_votes <- full_votes %>%
+    left_join(total_votes, by = "District")
+  return(full_votes)
+}
+
+
+amended <- vote_prep(full_votes)
+
+a2 <- amended %>%
+  mutate(WI = "WI") %>%
+  group_by(WI) %>%
+  summarize(total_dem = sum(Dem_votes),
+            total_rep = sum(Rep_votes),
+            total_total = sum(total_votes))
+
+Vrep <- a2$total_rep
+Vdem <- a2$total_dem
+Vtotal <- a2$total_total
+Srep <- as.numeric(61)
+Sdem <- as.numeric(38)
+Stot <- as.numeric(99)
+
+Vmargin <- ((Vrep - Vdem) / Vtotal)
+Smargin <- 0.5 * ((Srep - Sdem) / Stot)
+
+EG_sa2010 <- as.numeric(Vmargin - Smargin)
+
+full_2016 <- year_baseline_data(2016)
+
+a3 <- vote_prep(full_2016)
+
+a3 <- a3 %>%
+  mutate(WI = "WI") %>%
+  group_by(WI) %>%
+  summarize(total_dem = sum(Dem_votes),
+            total_rep = sum(Rep_votes),
+            total_total = sum(total_votes))
+
+Vrep <- a3$total_rep
+Vdem <- a3$total_dem
+Vtotal <- a3$total_total
+Srep <- as.numeric(64)
+Sdem <- as.numeric(35)
+Stot <- as.numeric(99)
+
+Vmargin <- ((Vrep - Vdem) / Vtotal)
+Smargin <- 0.5 * ((Srep - Sdem) / Stot)
+
+EG_sa2016 <- as.numeric(Vmargin - Smargin)
+
+
 ## Using Presidential Data
 
-Rseats2010 <- as.numeric(60)
-Dseats2010 <- as.numeric(38)
-Tseats <- as.numeric(99)
+
+
+
+hRseats2010 <- as.numeric(5)
+hDseats2010 <- as.numeric(3)
+hTseats2010 <- as.numeric(8)
 
 ## Using aggregated statewide race data
 
@@ -129,22 +195,3 @@ Vmargin_sen <- ((Vrep_sen - Vdem_sen) / Vtot_sen)
 EG_s2000 <- as.numeric(Vmargin_sen - Smargin)
 
 avg_EG_2000 <- mean(c(EG_h2000, EG_p2000, EG_s2000))
-
-
-
-## SCRATCH CODE DO NOT RUN ##
-
-h2000_all <- house_2000 %>%
-  filter(party == "DEM" | party == "REP") %>%
-  group_by(district, party) %>%
-  summarize(total_votes = sum(total.votes), total_votes_2p = mean(total_votes_2p))
-
-m2000 <- m1 %>%
-  group_by(office, party) %>%
-  summarize(total_votes = mean(total_votes), total_votes_2p = mean(total_votes_2p), cand_total_votes = mean(cand_total_votes))
-
-house <- m1 %>%
-  filter(office == "House") %>%
-  group_by(district) %>%
-  summarize(total_votes = mean(total_votes), total_votes_2p = mean(total_votes_2p),
-            cand_total_votes = mean(cand_total_votes))

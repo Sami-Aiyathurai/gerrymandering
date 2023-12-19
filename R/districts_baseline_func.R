@@ -63,9 +63,9 @@ trimmed_func <- function(x, i) {
 
 # vote_estimate returns
 vote_estimate <- function(x,...) {
-  est_dem <- x[[2]] * x[[3]]
-  est_rep <- x[[2]] * x[[4]]
-  l1 <- list(District = x[[1]], Dem_votes = est_dem, Rep_votes = est_rep, Contested = "Uncontested")
+  est_dem <- as.integer(x[[2]] * x[[3]])
+  est_rep <- as.integer(x[[2]] * x[[4]])
+  l1 <- list(District = x[[1]], Dem_votes = est_dem, Rep_votes = est_rep, Contested = "uncontested")
   return(l1)
 }
 
