@@ -1,15 +1,16 @@
-#' @export
+#' @param year_data data frame as returned from access_state_year
 contest_di <- function(year_data){
   sa_data <- year_data %>%
-    filter(party == "DEM" | party == "REP") %>%
-    filter(office == "State Assembly")
+    dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
+    dplyr::filter(.data[["office"]] == "State Assembly")
   di_data_sa <- sa_data %>%
-    group_by(district)  %>%
-    summarize(contest_d = sum(contest_dem), contest_r = sum(contest_rep))
+    dplyr::group_by(district)  %>%
+    dplyr::summarize(contest_d = sum(.data[["contest_dem"]]), contest_r = sum(.data[["contest_rep"]]))
   for (district in di_data_sa) {
     di_data_sa$contested <- ifelse((di_data_sa$contest_d == 0) | (di_data_sa$contest_r == 0), "uncontested", "contested")
   }
-  full_sa_di <- sa_data %>% left_join(di_data_sa, by=c('district'))
+  full_sa_di <- sa_data %>%
+    dplyr::left_join(di_data_sa, by=c('district'))
   return(full_sa_di)
 }
 
@@ -21,7 +22,7 @@ contest_di <- function(year_data){
 #' Each year consists of a list of the contested districts and uncontested
 #' districts for the state assembly election
 #'
-#' currently the function only works for Wisconson
+#' currently the function only works for Wisconsin
 #'
 #'
 #' @return an eleven element list of the major election years from 2000-2020.
@@ -42,6 +43,7 @@ contest_di <- function(year_data){
 #' * contested
 #'
 #' @import tidyverse
+#' @param data the full list of data frames from generate data
 #' @export
 
 sa_contest_all<- function(data){

@@ -2,12 +2,15 @@
 % Please edit documentation in R/data_cleaning_uncontested.R
 \name{check_districts}
 \alias{check_districts}
-\title{check_districts creats an integer vector with the unique number of districts in the year. This is important
+\title{check_districts creates an integer vector with the unique number of districts in the year. This is important
 for iteration.}
 \usage{
 check_districts(x)
 }
+\arguments{
+\item{x}{data frame returned by the contested or uncontested state assembly data}
+}
 \description{
-check_districts creats an integer vector with the unique number of districts in the year. This is important
+check_districts creates an integer vector with the unique number of districts in the year. This is important
 for iteration.
 }

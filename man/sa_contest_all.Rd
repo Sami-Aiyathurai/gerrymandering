@@ -8,6 +8,9 @@ with every even year's election data on State assembly}
 \usage{
 sa_contest_all(data)
 }
+\arguments{
+\item{data}{the full list of data frames from generate data}
+}
 \value{
 an eleven element list of the major election years from 2000-2020.
 Each year returns a list of two dataframes with the contested and
@@ -33,5 +36,5 @@ Each year consists of a list of the contested districts and uncontested
 districts for the state assembly election
 }
 \details{
-currently the function only works for Wisconson
+currently the function only works for Wisconsin
 }

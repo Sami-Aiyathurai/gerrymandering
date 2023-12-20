@@ -2,10 +2,19 @@
 % Please edit documentation in R/data_cleaning_uncontested.R
 \name{vote_join}
 \alias{vote_join}
-\title{vote_join combines the}
+\title{vote_join combines the original data frame and appends the total statewide votes for
+all parties and two parties.}
 \usage{
 vote_join(x, y, z)
 }
+\arguments{
+\item{x}{data frame created by open_elections_factory and generate_data}
+
+\item{y}{data frame created by total_vote_func}
+
+\item{z}{data frame created by total_vote_2p_func}
+}
 \description{
-vote_join combines the
+vote_join combines the original data frame and appends the total statewide votes for
+all parties and two parties.
 }

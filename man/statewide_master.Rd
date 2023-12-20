@@ -10,6 +10,9 @@ defined as the total votes cast for either the Democrat or Republican parties.}
 \usage{
 statewide_master(x)
 }
+\arguments{
+\item{x}{data frame created by open_elections_factory and generate_data}
+}
 \description{
 The functions in this file are called within districts_baselin_func.R to create the baselines for uncontested
 districts.

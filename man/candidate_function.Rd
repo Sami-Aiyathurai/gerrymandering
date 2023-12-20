@@ -5,7 +5,10 @@
 \title{candidate_function should only be run on two party races, and summarizes the data to provide vote shares and
 proportions for candidates. This allows us to then find average proportions to estimate vote shares.}
 \usage{
-candidate_function(x, ...)
+candidate_function(x)
+}
+\arguments{
+\item{x}{data frame of state assembly district data}
 }
 \description{
 candidate_function should only be run on two party races, and summarizes the data to provide vote shares and
