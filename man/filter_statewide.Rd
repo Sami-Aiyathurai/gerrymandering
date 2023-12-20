@@ -9,6 +9,9 @@ staggered.}
 \usage{
 filter_statewide(x)
 }
+\arguments{
+\item{x}{data frame created by open_elections_factory and generate_data}
+}
 \description{
 filter_statewide takes the entire state's voting data for a given year and filters it so that only the most
 prominent statewide offices are included: Senate, President, Attorney General, Secretary of State, and

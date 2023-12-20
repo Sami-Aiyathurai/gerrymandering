@@ -4,7 +4,6 @@
 #' election data from the OpenElections github for that state and year
 #'
 #' @param state A character vector representing either WI or MI
-#' @param year A character vector identifying the requested year
 #' @return A list of eleven data frames, each of election data from Wisconsin and
 #'  year with the following columns
 #' * county
@@ -47,14 +46,9 @@ open_elections_factory <- function(state) {
   }
 }
 
-
 #' Retrieves election data for Wisconsin from the years 2000-2020
-#'
 #' If given Wisconsin and a year, this function returns all
 #' election data from the OpenElections github for that state and year
-#'
-#' @param state A character vector representing either WI or MI
-#' @param year A character vector identifying the requested year
 #' @return A list of eleven data frames, each of election data from Wisconsin and
 #'  year with the following columns
 #' * county
@@ -72,7 +66,7 @@ open_elections_factory <- function(state) {
 #' Note that many of the fields may be an empty string
 #'
 #' @import tidyverse
-
+#' @param oe_data A character vector representing wi
 #' @export
 generate_data <- function(oe_data){
   dfs <- list()
@@ -87,9 +81,7 @@ generate_data <- function(oe_data){
 #'
 #' If given Wisconsin and a year, this function returns all
 #' election data from the OpenElections github for that state and year
-#'
-#' @param state A character vector representing either WI or MI
-#' @param year A character vector identifying the requested year
+
 #' @return A list of eleven data frames, each of election data from Wisconsin and
 #'  year with the following columns
 #' * county
@@ -107,7 +99,16 @@ generate_data <- function(oe_data){
 #' Note that many of the fields may be an empty string
 #'
 #' @import tidyverse
+#' @importFrom rlang .data
+#' @importFrom dplyr %>%
+#' @importFrom dplyr filter
+#' @importFrom dplyr group_by
+#' @importFrom dplyr summarize
+#' @importFrom dplyr left_join
+#' @importFrom dplyr right_join
 
+#' @param year A character vector identifying the requested year
+#' @param data the primary data frame with all of the information for the given year
 #' @export
 access_state_year <- function(year, data){
   state_year <- data[[year]]

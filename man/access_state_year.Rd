@@ -9,7 +9,7 @@ access_state_year(year, data)
 \arguments{
 \item{year}{A character vector identifying the requested year}
 
-\item{state}{A character vector representing either WI or MI}
+\item{data}{the primary data frame with all of the information for the given year}
 }
 \value{
 A list of eleven data frames, each of election data from Wisconsin and

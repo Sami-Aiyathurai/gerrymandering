@@ -9,7 +9,8 @@ year_baseline_data(year, data)
 \arguments{
 \item{year}{A character vector identifying the requested year}
 
-\item{state}{A character vector representing either WI or MI}
+\item{data}{the primary data frame with everything for the state
+as returned by generate data}
 }
 \value{
 A list of eleven data frames, each of election data from Wisconsin and

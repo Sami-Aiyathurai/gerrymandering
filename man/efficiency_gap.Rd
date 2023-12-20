@@ -10,6 +10,11 @@ and Republican votes.}
 \usage{
 efficiency_gap(full_votes, year)
 }
+\arguments{
+\item{full_votes}{data frame as made by year_baseline_data function}
+
+\item{year}{a numeric vector as inputted by the user within the year range 2006-2020}
+}
 \description{
 The efficiency_gap function receives the object of year_baseline_data and the user can
 input the year they are investigating. This function enters the preset WI General Assembly

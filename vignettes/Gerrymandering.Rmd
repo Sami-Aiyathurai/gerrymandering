@@ -26,6 +26,7 @@ This package is fundamental to the honors thesis of Molly Zelloe, and the functi
 
 ```{r setup}
 library(gerrymandering)
+library(tidyverse)
 ```
 
 ## Datasets
@@ -42,13 +43,16 @@ There are four objects that are returned from the functionality of the data, and
 
 # Example 1: Full state data
 
-The first object that our functions generate is a list of data frames, where each list element exists for a year's worth of electoral data. Each year can be indexed to yield data frames. This data frame can be manipulated to the user's whims such as but not limited to exploring ward behavior, the presence of third parties, or differences in votes cast among office. 
+The user must first call the `open_elections_factory` on a state. As of right now, the only state that will be accepted is Wisconsin, inputted as its abbreviation, "wi", as a character vector. This returns a function, not an object. 
+
+From there, the user can call `generate_data` on the function defined in the above factory, which is necessary to load the Wisconsin data from OpenElections for 2000 through 2020. The first object that our functions generate is a list of data frames, where each list element exists for a year's worth of electoral data. Each year can be indexed to yield data frames. This data frame can be manipulated to the user's whims such as but not limited to exploring ward behavior, the presence of third parties, or differences in votes cast among office. 
 
 ```{r}
-data <- generate_data()
+oe_data <- open_elections_factory("wi")
+
+data <- generate_data(oe_data)
 
 data[[6]]
-
 ```
 
 # Example 2: Baselines
@@ -59,7 +63,8 @@ The information here can be further examined if one was curious in the ratio of 
 
 ```{r}
 
-votes_2010 <- year_baseline_data(2010)
+votes_2010 <- year_baseline_data(2010, data)
+votes_2016 <- year_baseline_data(2016, data)
 
 ```
 
