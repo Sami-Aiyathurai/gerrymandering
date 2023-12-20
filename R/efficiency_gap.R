@@ -86,3 +86,11 @@ efficiency_gap_contested <- function(full_votes, year) {
   EG <- as.numeric(Vmargin - Smargin)
   return(EG)
 }
+
+#' @param full_votes A data frame of length 99, for each legislative district and
+#' and how they voted Democrat or Republican for a given year.
+#' @param year A character vector identifying the requested year. The user can
+#' input a numeric or integer vector, but the function will transform it into a character.
+#' @return A numeric vector, between -0.25 and 0.25 that estimates how gerrymandered the
+#' state assembly is.
+#'

@@ -55,28 +55,21 @@ data[[6]]
 
 The second object that is generated with our functions is the state assembly district baseline, which is calculated for each district that is uncontested in a given year. We used the notion of a baseline, as designed for U.S. House districts by [*Inside Elections*](https://www.insideelections.com/news/article/methodology-inside-elections-baseline-by-congressional-district). When given an uncontested district for a year, the function will pull statewide data associated with that legislative district's wards, isolating how that group of people voted for all offices (President, Senate, etc.) in that cycle. The function then pulls the voter data for that legislative district in the two election cycles prior, including previous state assembly results assuming the district was previously contested. From there, we create a trimmed means, where we remove the race with the highest Democratic vote share, and the race with the highest Republican vote share. The columns are then collapsed and averaged into the baseline: the average two party vote, and average Republican and Democrat vote shares. The baseline tells us how a district would have behaved, if it had been contested in that year. 
 
+The information here can be further examined if one was curious in the ratio of contested and uncontested districts, how much we estimated vote shares for them in comparison to other districts and years, and so forth. 
+
 ```{r}
 
 votes_2010 <- year_baseline_data(2010)
 
 ```
 
+## Example 3: Calculating Efficiency Gaps
 
+The final two objects that we can calculate for in this package are the efficiency gaps. The primary efficiency gap function, `efficiency_gap`, pulls on our preset data frame for each year's legislative compositions to calculate the seats-votes relationship. This function uses all of the estimated baselines and covers all districts for a given year. These values can be further studied and averaged over the whole redistricting cycle. 
 
-## Example: Observe baselines for select year
+The second form of the efficiency gap that we calculated, `efficiency_gap_contested`, has the same formula as the other, but only includes contested districts. Removing our baseline estimates show the troubling effects that these uncontested districts have on measurements: if unaccounted for, the results change drastically. We wanted to include both versions to highlight the importance of our generated, baseline data. 
 
 ```{r}
-data <- generate_data()
-
-votes_2010 <- year_baseline_data(2010)
-
-baselines_2010 <- votes_2010 %>%
-  filter(Contested == "uncontested")
-
-baselines_2010
-
-votes_2016 <- year_baseline_data(2016)
-
 eg_2010 <- efficiency_gap(votes_2010, 2010)
 eg_2016 <- efficiency_gap(votes_2016, 2016)
 
@@ -84,3 +77,4 @@ eg_con_2010 <- efficiency_gap_contested(votes_2010, 2010)
 eg_con_2016 <- efficiency_gap_contested(votes_2016, 2016)
 ```
 
+The results of the efficiency gaps here can be interpreted as such. The gap for 2010 of -0.067 presents an indication of a likely Republican gerrymander, but it is below the +/- 0.08 threshold set forth by Stephanopoulos and McGhee to make it unconstitutional. The same results for only contested districts shows nearly neutral maps, with the value being -0.01. If one was only using the contested districts, they would interpret the results as being neutral, which we know they are not. For 2016, however, the differences grow more disparate. The regular gap in 2016 was -0.096, which is beyond the benchmark of the authors, indicating the maps as particularly egregious. However, when the contested form is taken, it presents a slight Democratic gerrymander at 0.036. Again, this shows the sensitivity of the metric, but the importance of considering uncontested districts, especially when observing behavior of an entire state and state assembly. 
