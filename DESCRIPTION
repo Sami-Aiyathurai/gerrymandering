@@ -14,3 +14,7 @@ BugReports: https://github.com/Sami-Aiyathurai/gerrymandering/issues
 Imports: 
     tidyverse,
     utils
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
