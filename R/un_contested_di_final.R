@@ -44,14 +44,14 @@ contest_di <- function(year_data){
 #' @import tidyverse
 #' @export
 
-sa_contest_all_wi <- function(){
-  sa_contest_dfs_wi <- list()
+sa_contest_all<- function(data){
+  sa_contest_dfs<- list()
   for(i in seq(2000, 2020, 2)){
     year <- toString(i)
-    year_data <- access_state_year("wi", year, data)
-    sa_contest_dfs_wi[[year]] <- contest_di(year_data)
+    year_data <- access_state_year(year, data)
+    sa_contest_dfs[[year]] <- contest_di(year_data)
   }
-  return(sa_contest_dfs_wi)
+  return(sa_contest_dfs)
 }
 
 

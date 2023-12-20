@@ -65,3 +65,11 @@ vote_estimate <- function(x,...) {
   return(l1)
 }
 
+#'@export
+dis_baseline_ve <- function(dis_num, data){
+  base_sa <- baseline_function(data)
+  trim_sa <- slicing_func(base_sa)
+  trimmed_sa <- trimmed_func(trim_sa, dis_num)
+  ve <- vote_estimate(trimmed_sa)
+  return(ve)
+}
