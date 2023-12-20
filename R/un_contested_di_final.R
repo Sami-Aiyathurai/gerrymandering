@@ -14,16 +14,19 @@ contest_di <- function(year_data){
 }
 
 
-#' This makes use of the data generated in generate_data_final and the access_state_year functiond defined there
-#' to generate a list of 11 elements with every even year's election data on State assembly
+#' This makes use of the data generated in generate_data_final and the
+#' access_state_year functiond defined there to generate a list of 11 elements
+#' with every even year's election data on State assembly
 #'
-#' Each year consists of a list of the contested districts and uncontested districts for the state assembly election
+#' Each year consists of a list of the contested districts and uncontested
+#' districts for the state assembly election
 #'
 #' currently the function only works for Wisconson
 #'
 #'
 #' @return an eleven element list of the major election years from 2000-2020.
-#' Each year returns a list of two dataframes with the contested and uncontested districts for state assembly
+#' Each year returns a list of two dataframes with the contested and
+#' uncontested districts for state assembly
 #' Each dataframe has the following columns
 #' * county
 #' * ward
@@ -38,8 +41,6 @@ contest_di <- function(year_data){
 #' * year
 #' * contested
 #'
-#' Note that many of the fields may be an empty string
-#'
 #' @import tidyverse
 #' @export
 
@@ -52,5 +53,6 @@ sa_contest_all_wi <- function(){
   }
   return(sa_contest_dfs_wi)
 }
+
 
 
