@@ -5,7 +5,12 @@
 \title{district_func binds together the district-based race with the statewide race to extract how that district
 behaved in a statewide race. This is used to create the baseline and estimate district behavior.}
 \usage{
-district_func(x, y, ...)
+district_func(x, y)
+}
+\arguments{
+\item{x}{data frame of state assembly by district, as established by for loops}
+
+\item{y}{data frame of statewide data for the given year}
 }
 \description{
 district_func binds together the district-based race with the statewide race to extract how that district

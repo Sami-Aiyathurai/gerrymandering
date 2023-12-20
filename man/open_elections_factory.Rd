@@ -8,8 +8,6 @@ open_elections_factory(state)
 }
 \arguments{
 \item{state}{A character vector representing either WI or MI}
-
-\item{year}{A character vector identifying the requested year}
 }
 \value{
 A list of eleven data frames, each of election data from Wisconsin and

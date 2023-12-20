@@ -6,6 +6,9 @@
 \usage{
 total_vote_func(x)
 }
+\arguments{
+\item{x}{data frame created by open_elections_factory and generate_data}
+}
 \description{
 total_vote_func takes the filtered statewide information and finds
 }

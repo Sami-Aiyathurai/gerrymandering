@@ -3,8 +3,9 @@
 #' If given Wisconsin and a year, this function returns all
 #' election data from the OpenElections github for that state and year
 #'
-#' @param state A character vector representing either WI or MI
 #' @param year A character vector identifying the requested year
+#' @param data the primary data frame with everything for the state
+#' as returned by generate data
 #' @return A list of eleven data frames, each of election data from Wisconsin and
 #'  year with the following columns
 #' * county
@@ -22,7 +23,6 @@
 #' Note that many of the fields may be an empty string
 #'
 #' @import tidyverse
-
 #' @export
 year_baseline_data <- function(year, data) {
   districts_full <- data.frame(District = 1:99,
@@ -47,16 +47,17 @@ year_baseline_data <- function(year, data) {
   statewide_main_minus_two <- statewide_master(main_minus_two)
   statewide_main_minus_four <- statewide_master(main_minus_four)
 
-  contested_main_year <- main_year %>% filter(contested == "contested")
+  contested_main_year <- main_year %>%
+    dplyr::filter(.data[["contested"]] == "contested")
   con_districts_main_year <- check_districts(contested_main_year)
 
   for (i in con_districts_main_year) {
     temp <- contested_main_year %>%
-      filter(district == i) %>%
-      group_by(district, party, contested) %>%
-      summarize(cand_votes = sum(votes)) %>%
-      pivot_wider(names_from = "party", values_from = cand_votes) %>%
-      select(district, DEM, REP, contested)
+      dplyr::filter(.data[["district"]] == i) %>%
+      dplyr::group_by(.data[["district"]], .data[["party"]], .data[["contested"]]) %>%
+      dplyr::summarize(cand_votes = sum(.data[["votes"]])) %>%
+      tidyr::pivot_wider(names_from = "party", values_from = .data[["cand_votes"]]) %>%
+      dplyr::select(.data[["district"]], .data[["DEM"]], .data[["REP"]], .data[["contested"]])
     districts_full[i, ] <- temp
   }
 
@@ -66,8 +67,8 @@ year_baseline_data <- function(year, data) {
 
   for (i in un_districts_main_year) {
     temp <- uncon_main_year %>%
-      filter(district == i) %>%
-      subset(select=-c(contest_r, contest_d, contested))
+      dplyr::filter(.data[["district"]] == i) %>%
+      dplyr::select(-c("contest_r", "contest_d", "contested"))
     dis_name <- as.character(i)
     main_year <- district_func(temp, statewide_main_year)
     mainyearminus2 <- district_func(temp, statewide_main_minus_two)
