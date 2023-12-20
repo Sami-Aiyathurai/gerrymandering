@@ -40,9 +40,26 @@ Political science researchers, or anyone interested in the processes of redistri
 
 There are four objects that are returned from the functionality of the data, and each can have different uses.
 
-The first object that our functions generate is a list of dataframes, where each list element exists for a year's worth of electoral data
+# Example 1: Full state data
 
-We used the notion of a baseline, as designed for U.S. House districts by [*Inside Elections*](https://www.insideelections.com/news/article/methodology-inside-elections-baseline-by-congressional-district). When given an uncontested district for a year, the function will pull statewide data associated with that legislative district's wards, isolating how that group of people voted for all offices (President, Senate, etc.) in that cycle. The function then pulls the voter data for that legislative district in the two election cycles prior, including previous state assembly results assuming the district was previously contested. From there, we create a trimmed means, where we remove the race with the highest Democratic vote share, and the race with the highest Republican vote share. The columns are then collapsed and averaged into the baseline: the average two party vote, and average Republican and Democrat vote shares. The baseline tells us how a district would have behaved, if it had been contested in that year. 
+The first object that our functions generate is a list of data frames, where each list element exists for a year's worth of electoral data. Each year can be indexed to yield data frames. This data frame can be manipulated to the user's whims such as but not limited to exploring ward behavior, the presence of third parties, or differences in votes cast among office. 
+
+```{r}
+data <- generate_data()
+
+data[[6]]
+
+```
+
+# Example 2: Baselines
+
+The second object that is generated with our functions is the state assembly district baseline, which is calculated for each district that is uncontested in a given year. We used the notion of a baseline, as designed for U.S. House districts by [*Inside Elections*](https://www.insideelections.com/news/article/methodology-inside-elections-baseline-by-congressional-district). When given an uncontested district for a year, the function will pull statewide data associated with that legislative district's wards, isolating how that group of people voted for all offices (President, Senate, etc.) in that cycle. The function then pulls the voter data for that legislative district in the two election cycles prior, including previous state assembly results assuming the district was previously contested. From there, we create a trimmed means, where we remove the race with the highest Democratic vote share, and the race with the highest Republican vote share. The columns are then collapsed and averaged into the baseline: the average two party vote, and average Republican and Democrat vote shares. The baseline tells us how a district would have behaved, if it had been contested in that year. 
+
+```{r}
+
+votes_2010 <- year_baseline_data(2010)
+
+```
 
 
 

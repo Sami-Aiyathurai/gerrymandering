@@ -77,14 +77,3 @@ dis_baseline_ve <- function(dis_num, data){
   ve <- vote_estimate(trimmed_sa)
   return(ve)
 }
-
-
-#' @export
-votes_2010 <- year_baseline_data(2010)
-
-#' @export
-votes_2014 <- year_baseline_data(2014)
-#' @export
-votes_2016 <- year_baseline_data(2016)
-#' @export
-votes_2018 <- year_baseline_data(2018)
