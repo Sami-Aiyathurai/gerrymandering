@@ -1,11 +1,18 @@
+#' @export
 wi_full_sa_di <- sa_contest_all_wi()
 
-# Initializing dataframe with 99 districts, and empty vectors in Dem_votes, Rep_votes, and Contested
+#'@export
 districts_full <- data.frame(District = 1:99,
                            Dem_votes = integer(length(1:99)),
                            Rep_votes = integer(length(1:99)),
                            Contested = character(length(1:99)))
 
+#' Title
+#'
+#' @param year
+#'
+#' @return
+#' @export
 year_baseline_data <- function(year) {
   myear <- as.character(year)
   myearm2 <- as.character((year-2))
@@ -18,9 +25,7 @@ year_baseline_data <- function(year) {
   main_year_state <- access_state_year("wi", myear, data)
   main_minus_two <- access_state_year("wi", myearm2, data)
   main_minus_four <- access_state_year("wi", myearm4, data)
-  #gets statewide data for year and two previous years
 
-  #actually running on statewide master
   statewide_main_year <- statewide_master(main_year_state)
   statewide_main_minus_two <- statewide_master(main_minus_two)
   statewide_main_minus_four <- statewide_master(main_minus_four)
@@ -39,11 +44,9 @@ year_baseline_data <- function(year) {
   }
 
   un_districts_main_year <- check_districts(uncon_main_year)
-  # empty list to store data for year
   districts <- list()
   ve_list <- list()
-  # empty df to store data
-  # gets data for uncontested districts for year
+
   for (i in un_districts_main_year) {
     temp <- uncon_main_year %>%
       filter(district == i) %>%
@@ -59,6 +62,14 @@ year_baseline_data <- function(year) {
   return(districts_full)
 }
 
+#' Title
+#'
+#' @param year
+#'
+#' @return
+#' @export
+#'
+#' @examples
 dis_baseline_ve <- function(dis_num, data){
   base_sa <- baseline_function(data)
   trim_sa <- slicing_func(base_sa)
@@ -67,13 +78,13 @@ dis_baseline_ve <- function(dis_num, data){
   return(ve)
 }
 
-# The functions, when called and saved to an object, return a dataframe with the estimated vote shares in that
-# year for the state and the ACTUAL vote shares in contested districts!!
 
-# include message = false call perhaps
-
+#' @export
 votes_2010 <- year_baseline_data(2010)
-# for some reason 2012 isn't working
+
+#' @export
 votes_2014 <- year_baseline_data(2014)
+#' @export
 votes_2016 <- year_baseline_data(2016)
+#' @export
 votes_2018 <- year_baseline_data(2018)
