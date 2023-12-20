@@ -9,14 +9,15 @@ baseline_function <- function(x, ...) {
   base_x2 <- subsetting(base_x)
   return(base_x2)
 }
-#' @export
+
+#'@export
 subsetting <- function(x, ...) {
   tail <- tail(x, n=1)
   ifelse((is.na(tail$DEM)), x <- dem_prep(x), x <- rep_prep(x)) # standard for control flow MZ
   return(x)
 }
 
-#' @export
+#'@export
 dem_prep <- function(x) {
   prepped <- x %>%
     filter(!is.na(DEM)) %>%
@@ -24,7 +25,7 @@ dem_prep <- function(x) {
   return(prepped)
 }
 
-#' @export
+#'@export
 rep_prep <- function(x) {
   temp <- x %>%
     filter(!is.na(REP)) %>%
@@ -46,7 +47,7 @@ slicing_func <- function(x) {
 #' @export
 trimmed_func <- function(x, i) {
   x <- x %>%
-    mutate(district = i) %>% # where i is whatever district it is on
+    mutate(district = i) %>%
     mutate(diff = DEM - REP) %>%
     group_by(district) %>%
     summarize(avg_total_2p = mean(total_votes_2p),
@@ -56,7 +57,7 @@ trimmed_func <- function(x, i) {
   return(x)
 }
 
-#' @export
+#'@export
 vote_estimate <- function(x,...) {
   est_dem <- as.integer(x[[2]] * x[[3]])
   est_rep <- as.integer(x[[2]] * x[[4]])

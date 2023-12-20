@@ -25,14 +25,14 @@ open_elections_factory <- function(state) {
 
 oe_data <- open_elections_factory("wi")
 
-#' Retrieves election data for Michigan and Wisconsin from the years 2000-2020
+#' Retrieves election data for Wisconsin from the years 2000-2020
 #'
-#' If given either Michigan or Wisconsin and a year, this function returns all
-#' election data from the openelections github for that state and year
+#' If given Wisconsin and a year, this function returns all
+#' election data from the OpenElections github for that state and year
 #'
 #' @param state A character vector representing either WI or MI
 #' @param year A character vector identifying the requested year
-#' @return A list of eleven dataframes, each of election data from Wisconsin and
+#' @return A list of eleven data frames, each of election data from Wisconsin and
 #'  year with the following columns
 #' * county
 #' * ward
@@ -60,31 +60,7 @@ generate_data <- function(){
   return(dfs)
 }
 
-
-#' Retrieves election data for Michigan and Wisconsin from the years 2000-2020
-#'
-#' If given a year, this function returns all election data from the o
-#' penelections github for Wisconsin and that year
-#'
-#' @param data A dataframe of eleven years of election data for Wisconsin
-#' @param year A character vector identifying the requested year
-#' @return A dataframe of election data from year with the following columns
-#' * county
-#' * ward
-#' * office
-#' * district
-#' * total.votes
-#' * party
-#' * candidate
-#' * votes
-#' * contest_dem
-#' * contest_rep
-#' * year
-#'
-#'
-#' @import tidyverse
 #' @export
-
 access_state_year <- function(year, data){
   state_year <- data[[year]]
   return(state_year)
