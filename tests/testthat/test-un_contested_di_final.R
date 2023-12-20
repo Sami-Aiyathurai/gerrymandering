@@ -1,4 +1,11 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+library(tidyverse)
+oe_data <- open_elections_factory("wi")
+
+
+test_that("generatedata returns 11 dataframes", {
+  expect_equal(length(sa_contest_all(generate_data(oe_data))), 11)
 })
-'# sa_contest_all test has contested column
+
+test_that("generatedata dataframes have 14 columns", {
+  expect_equal(length(sa_contest_all(generate_data(oe_data))[[1]]), 14)
+})
