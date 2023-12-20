@@ -1,30 +1,47 @@
-#' @export
-wi_full_sa_di <- sa_contest_all_wi()
-
-#'@export
-districts_full <- data.frame(District = 1:99,
-                           Dem_votes = integer(length(1:99)),
-                           Rep_votes = integer(length(1:99)),
-                           Contested = character(length(1:99)))
-
-#' Title
+#' Retrieves election data for Wisconsin from the years 2000-2020
 #'
-#' @param year
+#' If given Wisconsin and a year, this function returns all
+#' election data from the OpenElections github for that state and year
 #'
-#' @return
+#' @param state A character vector representing either WI or MI
+#' @param year A character vector identifying the requested year
+#' @return A list of eleven data frames, each of election data from Wisconsin and
+#'  year with the following columns
+#' * county
+#' * ward
+#' * office
+#' * district
+#' * total.votes
+#' * party
+#' * candidate
+#' * votes
+#' * contest_dem
+#' * contest_rep
+#' * year
+#'
+#' Note that many of the fields may be an empty string
+#'
+#' @import tidyverse
+
 #' @export
-year_baseline_data <- function(year) {
+year_baseline_data <- function(year, data) {
+  districts_full <- data.frame(District = 1:99,
+                               Dem_votes = integer(length(1:99)),
+                               Rep_votes = integer(length(1:99)),
+                               Contested = character(length(1:99)))
+
   myear <- as.character(year)
   myearm2 <- as.character((year-2))
   myearm4 <- as.character((year-4))
 
-  main_year <- wi_full_sa_di[[myear]]
+  full_sa_di <- sa_contest_all(data)
+  main_year <- full_sa_di[[myear]]
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
 
-  main_year_state <- access_state_year("wi", myear, data)
-  main_minus_two <- access_state_year("wi", myearm2, data)
-  main_minus_four <- access_state_year("wi", myearm4, data)
+  main_year_state <- access_state_year(myear, data)
+  main_minus_two <- access_state_year(myearm2, data)
+  main_minus_four <- access_state_year(myearm4, data)
 
   statewide_main_year <- statewide_master(main_year_state)
   statewide_main_minus_two <- statewide_master(main_minus_two)
@@ -62,18 +79,4 @@ year_baseline_data <- function(year) {
   return(districts_full)
 }
 
-#' Title
-#'
-#' @param year
-#'
-#' @return
-#' @export
-#'
-#' @examples
-dis_baseline_ve <- function(dis_num, data){
-  base_sa <- baseline_function(data)
-  trim_sa <- slicing_func(base_sa)
-  trimmed_sa <- trimmed_func(trim_sa, dis_num)
-  ve <- vote_estimate(trimmed_sa)
-  return(ve)
-}
+
