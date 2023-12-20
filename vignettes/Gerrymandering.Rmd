@@ -47,12 +47,20 @@ The user must first call the `open_elections_factory` on a state. As of right no
 
 From there, the user can call `generate_data` on the function defined in the above factory, which is necessary to load the Wisconsin data from OpenElections for 2000 through 2020. The first object that our functions generate is a list of data frames, where each list element exists for a year's worth of electoral data. Each year can be indexed to yield data frames. This data frame can be manipulated to the user's whims such as but not limited to exploring ward behavior, the presence of third parties, or differences in votes cast among office. 
 
+Running `access_state_year` with the year as a character vector as the first argument and the data set as the second argument will generate a data frame for just the year the user would like to observe. 
+
+To view only the contested districts for the data set, one can run `sa_contest_all`, which will return a list of data frames where each element corresponds with a given year. The user can then examine the amount of contested districts in each year, and use this for future analysis on competitiveness. 
+
 ```{r}
 oe_data <- open_elections_factory("wi")
 
 data <- generate_data(oe_data)
 
 data[[6]]
+
+data_2010 <- access_state_year("2010", data)
+
+contested <- sa_contest_all(data)
 ```
 
 # Example 2: Baselines
@@ -61,11 +69,12 @@ The second object that is generated with our functions is the state assembly dis
 
 The information here can be further examined if one was curious in the ratio of contested and uncontested districts, how much we estimated vote shares for them in comparison to other districts and years, and so forth. 
 
+It is normal for this step to generate a series of messages regarding the summarize function. These are no reason for concern. 
+
 ```{r}
-
 votes_2010 <- year_baseline_data(2010, data)
-votes_2016 <- year_baseline_data(2016, data)
 
+votes_2016 <- year_baseline_data(2016, data)
 ```
 
 ## Example 3: Calculating Efficiency Gaps
@@ -76,10 +85,12 @@ The second form of the efficiency gap that we calculated, `efficiency_gap_contes
 
 ```{r}
 eg_2010 <- efficiency_gap(votes_2010, 2010)
+
 eg_2016 <- efficiency_gap(votes_2016, 2016)
 
 eg_con_2010 <- efficiency_gap_contested(votes_2010, 2010)
+
 eg_con_2016 <- efficiency_gap_contested(votes_2016, 2016)
 ```
 
-The results of the efficiency gaps here can be interpreted as such. The gap for 2010 of -0.067 presents an indication of a likely Republican gerrymander, but it is below the +/- 0.08 threshold set forth by Stephanopoulos and McGhee to make it unconstitutional. The same results for only contested districts shows nearly neutral maps, with the value being -0.01. If one was only using the contested districts, they would interpret the results as being neutral, which we know they are not. For 2016, however, the differences grow more disparate. The regular gap in 2016 was -0.096, which is beyond the benchmark of the authors, indicating the maps as particularly egregious. However, when the contested form is taken, it presents a slight Democratic gerrymander at 0.036. Again, this shows the sensitivity of the metric, but the importance of considering uncontested districts, especially when observing behavior of an entire state and state assembly. 
+The results of the efficiency gaps here can be interpreted. The gap for 2010 of -0.067 presents an indication of a likely Republican gerrymander, but it is below the +/- 0.08 threshold set forth by Stephanopoulos and McGhee to make it unconstitutional. The same results for only contested districts shows nearly neutral maps, with the value being -0.01. If one was only using the contested districts, they would interpret the results as being neutral, which we know they are not. For 2016, however, the differences grow more disparate. The regular gap in 2016 was -0.096, which is beyond the benchmark of the authors, indicating the maps as particularly egregious. However, when the contested form is taken, it presents a slight Democratic gerrymander at 0.036. Again, this shows the sensitivity of the metric, but the importance of considering uncontested districts, especially when observing behavior of an entire state and state assembly. 
