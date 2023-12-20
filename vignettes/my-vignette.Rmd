@@ -1,0 +1,38 @@
+---
+title: "Gerrymandering Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gerrymandering Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Every ten years, the United States of America performs a census of its citizens. Following the census, each state undergoes the process of redistricting to account for demographic movement, in which they redraw their congressional and state legislative maps to ensure population equality amongst the districts. However, the boundaries are typically drawn by partisan actors, who use this process to exclude specific groups from representation and entrench their own ideals. This process is called gerrymandering, and in this package, we will examine partisan gerrymandering, which is when districts are drawn to dilute the voting power of a party. 
+
+Partisan gerrymandering can occur anytime any maps are drawn for the single-member district, first-past-the-post electoral system in use in the United States. Whereas most research on partisan gerrymandering focuses on quantifying the distortions federally within the House of Representatives, we are interested in quantifying partisan gerrymandering as it occurs within state legislatures. More specifically, we are observing Wisconsin's General Assembly, the statewide equivalent of the House of Representatives, with data gathered from 2006 to 2020. Wisconsin has been a hotbed of gerrymandering since the 2012 redistricting, and its maps have been the focus of several court cases, both before state and federal courts. We are assessing State Assembly seats instead of State Senate seats because there are more Assembly districts than Senate, which gives more concentrated opportunities for analysis, as well as the fact that Assembly members are elected every two years, while Senators are staggered. This gives us far more data points, and mirrors research conducted on Congress. Notably, the Wisconsin General Assembly maps were found by the State Supreme Court in [*Gill v. Whitford*](https://www.supremecourt.gov/opinions/17pdf/16-1161_dc8f.pdf) (2018) to be unconstitutional partisan gerrymanders, and the efficiency gap was used to make the argument. Since the 2020 round of redistricting has occurred, the current maps have been in the midst of intense litigation, so it is helpful to truly understand how to quantify the metric and how the past decade has shaped the state's redistricting trajectory. 
+
+To measure partisan gerrymandering, we are using the [efficiency gap](https://chicagounbound.uchicago.edu/cgi/viewcontent.cgi?article=1946&context=public_law_and_legal_theory). Devised in 2014 by political scientists Nicholas Stephanopoulos and Eric McGhee, the efficiency gap aims to quantify the seats to votes distortion. It recognizes that complete proportionality is not only impossible given the geographic distribution of partisans, but is not a constitutional right, as affirmed by Chief Justice Roberts in [*Rucho v. Common Cause*] (https://www.supremecourt.gov/opinions/18pdf/18-422_9ol1.pdf). The efficiency gap allows a winner's bonus, or a slight extra boost in seat share to the majority party. The winner's bonus is violated however, and a gerrymander is considered to be egregious when the gap itself exceeds +/- 0.08, where negative numbers indicate the presence of a pro-Republican gerrymander, and positive numbers for pro-Democratic maps. 
+
+where provided that the gap itself does not exceed +/- 0.08, the gerrymander is not particularly egregious and does not violate 
+
+Our package, gerrymandering, is designed to access the OpenElections GitHub page, and pull files for Wisconsin and Michigan for 2000-2020. (Do I specify here that it's just for WI right now)
+
+- why partisan gerrymandering
+- why state legislatures
+- why Wisconsin
+- cite things!!
+
+This package addresses a gap within the academic world when it comes to partisan gerrymandering, or the drawing of legislative districts to dilute the voting power of partisan groups. Most academic work on partisan gerrymandering is done on congressional districts, however, partisan gerrymandering occurs at the state level as well.  
+
+```{r setup}
+library(gerrymandering)
+
+
+```

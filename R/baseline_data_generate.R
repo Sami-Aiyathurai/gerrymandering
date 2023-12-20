@@ -76,3 +76,4 @@ votes_2010 <- year_baseline_data(2010)
 # for some reason 2012 isn't working
 votes_2014 <- year_baseline_data(2014)
 votes_2016 <- year_baseline_data(2016)
+votes_2018 <- year_baseline_data(2018)
