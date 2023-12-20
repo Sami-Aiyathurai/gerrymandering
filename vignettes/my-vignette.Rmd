@@ -14,25 +14,56 @@ knitr::opts_chunk$set(
 )
 ```
 
+This is a package designed to calculate the efficiency gap, a metric of partisan gerrymandering, for the Wisconsin General Assembly, from 2006 to 2020. 
+
 Every ten years, the United States of America performs a census of its citizens. Following the census, each state undergoes the process of redistricting to account for demographic movement, in which they redraw their congressional and state legislative maps to ensure population equality amongst the districts. However, the boundaries are typically drawn by partisan actors, who use this process to exclude specific groups from representation and entrench their own ideals. This process is called gerrymandering, and in this package, we will examine partisan gerrymandering, which is when districts are drawn to dilute the voting power of a party. 
 
 Partisan gerrymandering can occur anytime any maps are drawn for the single-member district, first-past-the-post electoral system in use in the United States. Whereas most research on partisan gerrymandering focuses on quantifying the distortions federally within the House of Representatives, we are interested in quantifying partisan gerrymandering as it occurs within state legislatures. More specifically, we are observing Wisconsin's General Assembly, the statewide equivalent of the House of Representatives, with data gathered from 2006 to 2020. Wisconsin has been a hotbed of gerrymandering since the 2012 redistricting, and its maps have been the focus of several court cases, both before state and federal courts. We are assessing State Assembly seats instead of State Senate seats because there are more Assembly districts than Senate, which gives more concentrated opportunities for analysis, as well as the fact that Assembly members are elected every two years, while Senators are staggered. This gives us far more data points, and mirrors research conducted on Congress. Notably, the Wisconsin General Assembly maps were found by the State Supreme Court in [*Gill v. Whitford*](https://www.supremecourt.gov/opinions/17pdf/16-1161_dc8f.pdf) (2018) to be unconstitutional partisan gerrymanders, and the efficiency gap was used to make the argument. Since the 2020 round of redistricting has occurred, the current maps have been in the midst of intense litigation, so it is helpful to truly understand how to quantify the metric and how the past decade has shaped the state's redistricting trajectory. 
 
 To measure partisan gerrymandering, we are using the [efficiency gap](https://chicagounbound.uchicago.edu/cgi/viewcontent.cgi?article=1946&context=public_law_and_legal_theory). Devised in 2014 by political scientists Nicholas Stephanopoulos and Eric McGhee, the efficiency gap aims to quantify the seats to votes distortion. It recognizes that complete proportionality is not only impossible given the geographic distribution of partisans, but is not a constitutional right, as affirmed by Chief Justice Roberts in [*Rucho v. Common Cause*] (https://www.supremecourt.gov/opinions/18pdf/18-422_9ol1.pdf). The efficiency gap allows a winner's bonus, or a slight extra boost in seat share to the majority party. The winner's bonus is violated however, and a gerrymander is considered to be egregious when the gap itself exceeds +/- 0.08, where negative numbers indicate the presence of a pro-Republican gerrymander, and positive numbers for pro-Democratic maps. 
 
-where provided that the gap itself does not exceed +/- 0.08, the gerrymander is not particularly egregious and does not violate 
-
-Our package, gerrymandering, is designed to access the OpenElections GitHub page, and pull files for Wisconsin and Michigan for 2000-2020. (Do I specify here that it's just for WI right now)
-
-- why partisan gerrymandering
-- why state legislatures
-- why Wisconsin
-- cite things!!
-
-This package addresses a gap within the academic world when it comes to partisan gerrymandering, or the drawing of legislative districts to dilute the voting power of partisan groups. Most academic work on partisan gerrymandering is done on congressional districts, however, partisan gerrymandering occurs at the state level as well.  
+This package is fundamental to the honors thesis of Molly Zelloe, and the functions here are performing the invaluable calculations that she needs to address a gap in the literature. 
 
 ```{r setup}
 library(gerrymandering)
-
-
 ```
+
+## Datasets
+
+The package calls on data from the OpenElections Github repositories. [OpenElections](https://github.com/openelections) is a volunteer organization that organizes, cleans, and produces election data for every year, for every state, stretching back through 2000. Because this is a volunteer organization, not every state's data is equally clean, or even available, as was the case with Wisconsin's 2004 district-based data. We dealt with this issue by building the functions to only calculate information for years 2006 through 2020, as we can still use the statewide races provided in the 2004 data to calculate baselines. 
+
+## Who Should Use This Package?
+
+Political science researchers, or anyone interested in the processes of redistricting can use the package to explore Wisconsin's redistricting environment, or take inspiration from the functions presented here to pursue analysis of states of their choosing. 
+
+## What Can We Do With This Data?
+
+There are four objects that are returned from the functionality of the data, and each can have different uses.
+
+The first object that our functions generate is a list of dataframes, where each list element exists for a year's worth of electoral data
+
+We used the notion of a baseline, as designed for U.S. House districts by [*Inside Elections*](https://www.insideelections.com/news/article/methodology-inside-elections-baseline-by-congressional-district). When given an uncontested district for a year, the function will pull statewide data associated with that legislative district's wards, isolating how that group of people voted for all offices (President, Senate, etc.) in that cycle. The function then pulls the voter data for that legislative district in the two election cycles prior, including previous state assembly results assuming the district was previously contested. From there, we create a trimmed means, where we remove the race with the highest Democratic vote share, and the race with the highest Republican vote share. The columns are then collapsed and averaged into the baseline: the average two party vote, and average Republican and Democrat vote shares. The baseline tells us how a district would have behaved, if it had been contested in that year. 
+
+
+
+## Example: Observe baselines for select year
+
+```{r}
+data <- generate_data()
+
+votes_2010 <- year_baseline_data(2010)
+
+baselines_2010 <- votes_2010 %>%
+  filter(Contested == "uncontested")
+
+baselines_2010
+
+votes_2016 <- year_baseline_data(2016)
+
+eg_2010 <- efficiency_gap(votes_2010, 2010)
+eg_2016 <- efficiency_gap(votes_2016, 2016)
+
+eg_con_2010 <- efficiency_gap_contested(votes_2010, 2010)
+eg_con_2016 <- efficiency_gap_contested(votes_2016, 2016)
+```
+
