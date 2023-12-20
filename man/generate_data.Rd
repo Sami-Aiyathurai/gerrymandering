@@ -2,14 +2,14 @@
 % Please edit documentation in R/generate_data_final.R
 \name{generate_data}
 \alias{generate_data}
-\title{Retrieves election data for Wisconsin from the years 2000-2020}
+\title{Retrieves election data for Wisconsin from the years 2000-2020
+If given Wisconsin and a year, this function returns all
+election data from the OpenElections github for that state and year}
 \usage{
 generate_data(oe_data)
 }
 \arguments{
-\item{state}{A character vector representing either WI or MI}
-
-\item{year}{A character vector identifying the requested year}
+\item{oe_data}{A character vector representing wi}
 }
 \value{
 A list of eleven data frames, each of election data from Wisconsin and
@@ -31,6 +31,7 @@ year with the following columns
 Note that many of the fields may be an empty string
 }
 \description{
+Retrieves election data for Wisconsin from the years 2000-2020
 If given Wisconsin and a year, this function returns all
 election data from the OpenElections github for that state and year
 }

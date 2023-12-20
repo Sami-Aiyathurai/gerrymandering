@@ -9,6 +9,9 @@ This is called in district_func}
 \usage{
 check_wards(x)
 }
+\arguments{
+\item{x}{data frame of wards in a given state assembly district}
+}
 \description{
 Takes in the filtered statewide information and creates a character vector with all of the unique wards within
 the specified district. Each district is composed of specified wards, and by taking the unique wards of a

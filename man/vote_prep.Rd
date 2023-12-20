@@ -9,6 +9,9 @@ which is necessary for the efficiency gap.}
 \usage{
 vote_prep(full_votes)
 }
+\arguments{
+\item{full_votes}{data frame produced by the year_baseline_data function}
+}
 \description{
 vote_prep takes in full_votes, of the object from year_baseline_data, and finds the total votes cast
 for either of the major parties in each district. This number is joined to the primary data frame
