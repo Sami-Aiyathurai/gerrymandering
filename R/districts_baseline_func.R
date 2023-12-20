@@ -1,5 +1,6 @@
-#these are the functions called to generate the new vote shares
-#these access on a district bases
+## These functions generate the estimated vote shares for uncontested districts
+
+# creates the baseline by gathering the joined dataframes, pivots to flatten dataframe
 baseline_function <- function(x, ...) {
   base_x <- x %>%
     group_by(office, year, party, district) %>%
@@ -11,12 +12,16 @@ baseline_function <- function(x, ...) {
   return(base_x2)
 }
 
+# this function is called within baseline to take district for the year we're looking at
+# and run dem_prep and rep_prep on it to determine how NA's should be removed
 subsetting <- function(x, ...) {
   tail <- tail(x, n=1)
   ifelse((is.na(tail$DEM)), x <- dem_prep(x), x <- rep_prep(x)) # standard for control flow MZ
   return(x)
 }
 
+# if the uncontested district is won by a democrat, dem_prep redefines REP in terms of DEM
+# to remove NAs
 dem_prep <- function(x) {
   prepped <- x %>%
     filter(!is.na(DEM)) %>%
@@ -24,6 +29,7 @@ dem_prep <- function(x) {
   return(prepped)
 }
 
+# if uncontested district is won by Republican, rep_prep redefines DEM in terms of REP
 rep_prep <- function(x) {
   temp <- x %>%
     filter(!is.na(REP)) %>%
@@ -31,7 +37,7 @@ rep_prep <- function(x) {
   return(temp)
 }
 
-#trim data
+# slicing_func trims the data to remove the highest DEM prop and the highest REP prop
 slicing_func <- function(x) {
   hdem <- x %>%
     arrange(REP)
@@ -42,6 +48,7 @@ slicing_func <- function(x) {
   return(trimmed)
 }
 
+# trimmed_func produces averages the baseline to estimated votes cast (avg_total_2p), etc.
 trimmed_func <- function(x, i) {
   x <- x %>%
     mutate(district = i) %>% # where i is whatever district it is on
@@ -53,9 +60,12 @@ trimmed_func <- function(x, i) {
               avg_diff = mean(diff))
   return(x)
 }
-#i'm assuming x in this is what trimmed_func returns?
-vote_estimate <- function(x) {
+
+# vote_estimate returns
+vote_estimate <- function(x,...) {
   est_dem <- x[[2]] * x[[3]]
   est_rep <- x[[2]] * x[[4]]
-  return(c(est_dem, est_rep))
+  l1 <- list(District = x[[1]], Dem_votes = est_dem, Rep_votes = est_rep, Contested = "uncontested")
+  return(l1)
 }
+

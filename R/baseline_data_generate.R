@@ -1,5 +1,11 @@
 wi_full_sa_di <- sa_contest_all_wi()
 
+# Initializing dataframe with 99 districts, and empty vectors in Dem_votes, Rep_votes, and Contested
+districts_full <- data.frame(District = 1:99,
+                           Dem_votes = integer(length(1:99)),
+                           Rep_votes = integer(length(1:99)),
+                           Contested = character(length(1:99)))
+
 year_baseline_data <- function(year) {
   myear <- as.character(year)
   myearm2 <- as.character((year-2))
@@ -19,10 +25,24 @@ year_baseline_data <- function(year) {
   statewide_main_minus_two <- statewide_master(main_minus_two)
   statewide_main_minus_four <- statewide_master(main_minus_four)
 
+  contested_main_year <- main_year %>% filter(contested == "contested")
+  con_districts_main_year <- check_districts(contested_main_year)
+
+  for (i in con_districts_main_year) {
+    temp <- contested_main_year %>%
+      filter(district == i) %>%
+      group_by(district, party, contested) %>%
+      summarize(cand_votes = sum(votes)) %>%
+      pivot_wider(names_from = "party", values_from = cand_votes) %>%
+      select(district, DEM, REP, contested)
+    districts_full[i, ] <- temp
+  }
+
   un_districts_main_year <- check_districts(uncon_main_year)
   # empty list to store data for year
   districts <- list()
   ve_list <- list()
+  # empty df to store data
   # gets data for uncontested districts for year
   for (i in un_districts_main_year) {
     temp <- uncon_main_year %>%
@@ -33,13 +53,11 @@ year_baseline_data <- function(year) {
     mainyearminus2 <- district_func(temp, statewide_main_minus_two)
     mainyearminus4 <- district_func(temp, statewide_main_minus_four)
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
-    districts[[dis_name]][["mollysaveme"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
-  }
-  return(districts)
+    districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
+    districts_full[i, ] <- districts[[dis_name]][["estimates"]]
+    }
+  return(districts_full)
 }
-
-#this leaves me with data from three years for all uncontested districts in 2010
-testing1 <- year_baseline_data(2010)
 
 dis_baseline_ve <- function(dis_num, data){
   base_sa <- baseline_function(data)
@@ -49,15 +67,13 @@ dis_baseline_ve <- function(dis_num, data){
   return(ve)
 }
 
-#this works on a district basis
-#get baselines for district 3 and district 8
-base_sa3 <- baseline_function(testing1[["3"]])
-base_sa8 <- baseline_function(testing1[["8"]])
-#trim baselines
-trim_sa3 <- slicing_func(base_sa3)
-trim_sa8 <- slicing_func(base_sa8)
-#who knows
-trimmed_sa3 <- trimmed_func(trim_sa3, 3)
-trimmed_sa8 <- trimmed_func(trim_sa8, 8)
+# The functions, when called and saved to an object, return a dataframe with the estimated vote shares in that
+# year for the state and the ACTUAL vote shares in contested districts!!
 
+# include message = false call perhaps
 
+votes_2010 <- year_baseline_data(2010)
+# for some reason 2012 isn't working
+votes_2014 <- year_baseline_data(2014)
+votes_2016 <- year_baseline_data(2016)
+votes_2018 <- year_baseline_data(2018)
