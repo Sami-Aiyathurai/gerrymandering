@@ -73,16 +73,16 @@ district_func <- function(x, y,...) {
   tv2p_sax_year <- total_2p_vote_func(x)
   sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
     filter(party == "DEM" | party == "REP")
-  wards_sax_year <- data.frame(ward = check_wards(x)) # pulls the wards from the district we're looking at
+  wards_sax_year <- data.frame(ward = check_wards(x))
   statewide_x_year <- y %>%
-    right_join(wards_sax_year, by = "ward") # joins the wards to the statewide data to isolate wards we want
-  statewide_x_year <- statewide_x_year[-(12:13)] # removes the total votes columns bc they're for statewide
-  tv_statewide_x_year <- total_vote_func(statewide_x_year) # now we're pulling info for that district
+    right_join(wards_sax_year, by = "ward")
+  statewide_x_year <- statewide_x_year[-(12:13)]
+  tv_statewide_x_year <- total_vote_func(statewide_x_year)
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     filter(party == "DEM" | party == "REP")
   district_x_year <- rbind(statewide_x_year, sax_year)
-  district_x_year <- candidate_function(district_x_year) # now we're getting candidate vote totals, props for each district
+  district_x_year <- candidate_function(district_x_year)
 }
 
 #' @export
