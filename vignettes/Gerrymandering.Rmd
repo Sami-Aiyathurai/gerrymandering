@@ -24,7 +24,7 @@ To measure partisan gerrymandering, we are using the [efficiency gap](https://ch
 
 This package is fundamental to the honors thesis of Molly Zelloe, and the functions here are performing the invaluable calculations that she needs to address a gap in the literature. 
 
-```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=TRUE, results="hide"}
 library(gerrymandering)
 library(tidyverse)
 ```
@@ -51,7 +51,7 @@ Running `access_state_year` with the year as a character vector as the first arg
 
 To view only the contested districts for the data set, one can run `sa_contest_all`, which will return a list of data frames where each element corresponds with a given year. The user can then examine the amount of contested districts in each year, and use this for future analysis on competitiveness. 
 
-```{r, warning=FALSE, message=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=TRUE, results="hide"}
 oe_data <- open_elections_factory("wi")
 
 data <- generate_data(oe_data)
@@ -71,7 +71,7 @@ The information here can be further examined if one was curious in the ratio of 
 
 It is normal for this step to generate a series of messages regarding the summarize function. These are no reason for concern. 
 
-```{r, warning=FALSE, message=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=TRUE, results="hide"}
 votes_2010 <- year_baseline_data(2010, data)
 
 votes_2016 <- year_baseline_data(2016, data)
@@ -83,7 +83,7 @@ The final two objects that we can calculate for in this package are the efficien
 
 The second form of the efficiency gap that we calculated, `efficiency_gap_contested`, has the same formula as the other, but only includes contested districts. Removing our baseline estimates show the troubling effects that these uncontested districts have on measurements: if unaccounted for, the results change drastically. We wanted to include both versions to highlight the importance of our generated, baseline data. 
 
-```{r, warning=FALSE, message=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=TRUE, results="hide"}
 eg_2010 <- efficiency_gap(votes_2010, 2010)
 
 eg_2016 <- efficiency_gap(votes_2016, 2016)
