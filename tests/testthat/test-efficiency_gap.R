@@ -1,3 +1,4 @@
+library(tidyverse)
 oe_data <- open_elections_factory("wi")
 data <- generate_data(oe_data)
 full_votes <- year_baseline_data(2010, data)

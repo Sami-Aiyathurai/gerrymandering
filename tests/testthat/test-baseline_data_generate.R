@@ -1,3 +1,4 @@
+library(tidyverse)
 oe_data <- open_elections_factory("wi")
 
 data <- generate_data(oe_data)
