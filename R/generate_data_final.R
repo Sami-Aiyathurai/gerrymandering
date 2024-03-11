@@ -70,7 +70,7 @@ open_elections_factory <- function(state) {
 #' @export
 generate_data <- function(oe_data){
   dfs <- list()
-  for(i in seq(2000, 2020, 2)){
+  for(i in seq(2000, 2022, 2)){ # changed to include 2022
     year <- toString(i)
     dfs[[year]] <- oe_data(year)
   }
