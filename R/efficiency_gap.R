@@ -21,11 +21,11 @@ vote_prep <- function(full_votes) {
 #' @param year a numeric vector as inputted by the user within the year range 2006-2020
 #' @export
 efficiency_gap <- function(full_votes, year) {
-  wi_sa <- data.frame(Year = c("2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020"),
-                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99),
-                      Dem_seats = c(47, 52, 39, 39, 39, 36, 35, 36),
-                      Rep_seats = c(52, 47, 60, 60, 60, 63, 64, 63)
-  )
+  wi_sa <- data.frame(Year = c("2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
+                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99, 99),
+                      Dem_seats = c(47, 52, 39, 39, 39, 36, 35, 38, 35),
+                      Rep_seats = c(52, 47, 60, 60, 60, 63, 64, 61, 64)
+                      )
   myear <- as.character(year)
   wi_sa_year <- wi_sa %>%
     dplyr::filter(.data[["Year"]] == myear)
@@ -61,10 +61,10 @@ efficiency_gap <- function(full_votes, year) {
 #' input a numeric or integer vector, but the function will transform it into a character.
 #' @export
 efficiency_gap_contested <- function(full_votes, year) {
-  wi_sa <- data.frame(Year = c("2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020"),
-                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99),
-                      Dem_seats = c(47, 52, 39, 39, 39, 36, 35, 36),
-                      Rep_seats = c(52, 47, 60, 60, 60, 63, 64, 63)
+  wi_sa <- data.frame(Year = c("2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
+                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99, 99),
+                      Dem_seats = c(47, 52, 39, 39, 39, 36, 35, 38, 35),
+                      Rep_seats = c(52, 47, 60, 60, 60, 63, 64, 61, 64)
   )
   myear <- as.character(year)
   wi_sa_year <- wi_sa %>%

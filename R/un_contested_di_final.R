@@ -48,7 +48,7 @@ contest_di <- function(year_data){
 
 sa_contest_all<- function(data){
   sa_contest_dfs<- list()
-  for(i in seq(2000, 2020, 2)){
+  for(i in seq(2000, 2022, 2)){ # changed to include 2022
     year <- toString(i)
     year_data <- access_state_year(year, data)
     sa_contest_dfs[[year]] <- contest_di(year_data)
