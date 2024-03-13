@@ -63,7 +63,48 @@ michigan <- function(year,...) {
   return(mi_year)
 }
 
-mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
-                michigan(2016), michigan(2018), michigan(2020), michigan(2022))
+mi_2022 <- mi_data[[12]]
+mi_2022$votes <- as.numeric(mi_2022$votes)
+mi_2022$votes <- as.integer(mi_2022$votes)
 
-egs <- rbind(wi_egs, mi_egs)
+mi_2022 <- michigan(2022)
+
+## CO
+
+colorado <- function(year, ...) {
+  year <- as.character(year)
+  year_num <- as.numeric(year)
+  votes_year <- year_baseline_data_co(year_num, co_data)
+  eg_year <- efficiency_gap_co(votes_year, year_num)
+  eg_con_year <- efficiency_gap_contested_co(votes_year, year_num)
+
+  co_year <- data.frame(Year = year,
+                        Efficiency_gap = eg_year,
+                        Efficiency_gap_contested = eg_con_year,
+                        State = "CO")
+  return(co_year)
+}
+
+colorado(2008) # worked
+colorado(2010) # worked
+colorado(2012) # did not!!
+colorado(2014) # worked
+colorado(2016) # worked
+colorado(2018) # worked!
+colorado(2020) # worked!
+colorado(2022) # worked!!
+
+co_egs <- rbind(colorado(2008), colorado(2010), colorado(2014), colorado(2016),
+                colorado(2018), colorado(2020), colorado(2022))
+
+## THE PROBLEM WITH 2022 IS THAT THE DATA STRUCTURE ITSELF IS NOT THE SAME AS
+# FOR THE OTHER YEARS. IT HAS 2 EXTRA VARIABLES. THIS IS WHY BEFORE ANYTHING
+# ELSE CAN HAPPEN I NEED TO PROOF THE DFS TO MAKE SURE THEY ALL HAVE THE SAME STRUCTURE
+# AND VARIABLES AND FORMATTING
+
+# I don't think MI 2022 works oh well it's because votes are coded as characters not integers
+
+mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
+                michigan(2016), michigan(2018), michigan(2020))
+
+egs <- rbind(wi_egs, mi_egs, co_egs)
