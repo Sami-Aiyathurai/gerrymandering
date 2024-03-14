@@ -37,6 +37,10 @@ generate_data_nv <- function(oe_data){
 nv_data <- open_elections_factory_nv("nv")
 nv_data <- generate_data_nv(nv_data)
 
+nv_2022 <- access_state_year("2022", nv_data)
+cand_nv_2022 <- as.list(unique(nv_2022$candidate))
+
+
 
 nv_2008_sh_parties <- data.frame(
   candidate = c("Marilyn Kirkpatrick", "Linda West Myers",
