@@ -41,6 +41,7 @@ generate_data <- function(oe_data){
   return(dfs)
 }
 
+access_state_year <- function(year, data){
 access_state_year_mi <- function(year, data){
   state_year <- data[[year]]
 
@@ -95,13 +96,37 @@ filter_statewide_mi <- function(x) {
   return(x)
 }
 
+total_vote_func <- function(x) {
+  x <- x %>%
+    group_by(.data[["office"]]) %>%
+    summarize(total_votes = sum(.data[["votes"]]))
+  return(x)
+}
+
+total_2p_vote_func <- function(x) {
+  x <- x %>%
+    filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
+    group_by(.data[["office"]]) %>%
+    summarize(total_votes_2p = sum(.data[["votes"]]))
+  return(x)
+}
+
+vote_join <- function(x, y, z) {
+  x <- x %>%
+    left_join(y, by = "office") %>%
+    left_join(z, by = "office")
+  return(x)
+}
+
+check_districts <- function(x) {
+  x <- as.integer(unique(x$district))
+  return(x)
+}
+
 # x is the state assembly house data filtered for that year, y is the statewide data but where does x get created? Y gets created by statewide_master
 
 # x = sa_contest (product of sa_contest_all function on my_data)
 # y = statewide_master_mi (year requested statewide race info)
-
-contested_mi <- sa_contest_all_mi(mi_data)
-statewide_mi_2012 <- statewide_master_mi(access_state_year("2012",mi_data))
 
 district_func_mi <- function(x, y) {
   tv_sax_year <- total_vote_func(x)
@@ -164,9 +189,9 @@ year_baseline_data_mi <- function(year, data) {
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
 
-  main_year_state <- access_state_year_mi(myear, data)
-  main_minus_two <- access_state_year_mi(myearm2, data)
-  main_minus_four <- access_state_year_mi(myearm4, data)
+  main_year_state <- access_state_year(myear, data)
+  main_minus_two <- access_state_year(myearm2, data)
+  main_minus_four <- access_state_year(myearm4, data)
 
   statewide_main_year <- statewide_master_mi(main_year_state)
   statewide_main_minus_two <- statewide_master_mi(main_minus_two)

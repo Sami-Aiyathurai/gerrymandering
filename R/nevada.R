@@ -42,9 +42,6 @@ cand_nv_2022 <- as.list(unique(nv_2022$candidate))
 
 
 
-
-
-
 nv_2008_sh_parties <- data.frame(
   candidate = c("Marilyn Kirkpatrick", "Linda West Myers",
                 "Carlos Blumberg", "John Hambrick",

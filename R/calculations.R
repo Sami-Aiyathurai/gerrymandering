@@ -1,47 +1,46 @@
 # Mass EG calculations
 
+library(tidyverse)
+
 ## Wisconsin 2010-2020
 
 wi_data <- open_elections_factory("wi")
 wi_data <- generate_data(wi_data)
 wi_contested <- sa_contest_all(wi_data)
 
-variable_prep <- function(data) { # run this within each generate FUNC
-  data$party[data$party == "Democratic"] <- "DEM"
-  data$party[data$party == "Democrat"] <- "DEM"
-  data$party[data$party == "Democratic Party"] <- "DEM"
-  data$party[data$party == "Republican"] <- "REP"
-  data$party[data$party == "Republican Party"] <- "REP"
-  data$party[data$party == "Dem"] <- "DEM"
-  data$party[data$party == "Rep"] <- "REP"
-  data$office[data$office == "State Representative"] <- "State House"
-  data$office[data$office == "State Assembly"] <- "State House"
-  data$office[data$office == "Senate"] <- "U.S. Senate"
-  data$office[data$office == "US Senate"] <- "U.S. Senate"
-  return(data)
-}
+wi_2008 <- access_state_year("2008", wi_data)
+votes_2008 <- year_baseline_data(2008, wi_data)
 
-## IN WI: each df has 11 variables: county, ward, office, district, total.votes, party, candidate, votes, contest_dem, contest_rep, year
+wi_2012 <- access_state_year("2012", wi_data)
+votes_2012 <- year_baseline_data(2012, wi_data)
+
+# there's something wonky happening in year_baseline_data with 2012 but I don't feel like figuring it out right now so I won't!
 
 wisconsin <- function(year, ...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
-  #wi_year <- access_state_year(year, wi_data)
+  wi_year <- access_state_year(year, wi_data)
+  print(unique(wi_year$office))
+  print(unique(wi_year$district))
   votes_year <- year_baseline_data(year_num, wi_data)
-  eg_year <- efficiency_gap(votes_year, year_num)
-  eg_con_year <- efficiency_gap_contested(votes_year, year_num)
+  #eg_year <- efficiency_gap(votes_year, year_num)
+  #eg_con_year <- efficiency_gap_contested(votes_year, year_num)
 
-  wi_year <- data.frame(Year = year,
-                        Efficiency_gap = eg_year,
-                        Efficiency_gap_contested = eg_con_year,
-                        State = "WI")
-  return(wi_year)
+  #wi_year <- data.frame(Year = year,
+   ##                     Efficiency_gap = eg_year,
+     #                   Efficiency_gap_contested = eg_con_year,
+    #                    State = "WI")
+  #return(wi_year)
 }
+
+wisconsin(2012)
 
 # for some reason wi_2012 doesn't work???
 
+
 wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2014),
                 wisconsin(2016), wisconsin(2018), wisconsin(2020), wisconsin(2022))
+
 
 ## Michigan
 
@@ -54,6 +53,7 @@ mi_contested <- sa_contest_all_mi(mi_data)
 michigan <- function(year,...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
+  mi_year <- access_state_year(year, mi_data)
   #mi_year <- access_state_year_mi(year, mi_data)
   votes_year <- year_baseline_data_mi(year_num, mi_data)
   eg_year <- efficiency_gap_mi(votes_year, year_num)
