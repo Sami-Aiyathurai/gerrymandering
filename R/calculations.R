@@ -48,10 +48,13 @@ mi_data <- open_elections_factory_mi("mi")
 mi_data <- generate_data(mi_data)
 mi_contested <- sa_contest_all_mi(mi_data)
 
+## MI: each df has 10 variables: county, precinct, office, district, party, candidate, votes, contest_dem, contest_rep, year
+
 michigan <- function(year,...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
   mi_year <- access_state_year(year, mi_data)
+  #mi_year <- access_state_year_mi(year, mi_data)
   votes_year <- year_baseline_data_mi(year_num, mi_data)
   eg_year <- efficiency_gap_mi(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested_mi(votes_year, year_num)

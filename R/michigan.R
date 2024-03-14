@@ -22,6 +22,11 @@ open_elections_factory_mi <- function(state) {
       data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
       data$contest_rep <- ifelse(data$party == "REP", 1, 0)
       data$year <- as.numeric(year)
+
+      if (year == 2022) {
+        data$votes <- as.numeric(data$votes)
+        data$votes <- as.integer(data$votes)
+      }
     }
     data
   }
@@ -37,9 +42,14 @@ generate_data <- function(oe_data){
 }
 
 access_state_year <- function(year, data){
+access_state_year_mi <- function(year, data){
   state_year <- data[[year]]
+
   return(state_year)
 }
+
+mi_data <- open_elections_factory_mi("mi")
+mi_data <- generate_data(mi_data)
 
 ## uncontested step 1 functions modified
 
@@ -131,10 +141,13 @@ district_func_mi <- function(x, y) {
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
+  print(names(statewide_x_year))
+  print(names(sax_year))
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
 }
 
+district_func_mi(contested_mi, statewide_mi_2012)
 
 check_precincts <- function(x) { # remade this function to be precincts not wards, put into district_func
   uprecinct <- (unique(x$precinct))
@@ -210,9 +223,12 @@ year_baseline_data_mi <- function(year, data) {
     main_year <- district_func_mi(temp, statewide_main_year) # district func mi
     mainyearminus2 <- district_func_mi(temp, statewide_main_minus_two) # district_func_mi
     mainyearminus4 <- district_func_mi(temp, statewide_main_minus_four) # district_func_mi
-    districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
-    districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
-    districts_full[i, ] <- districts[[dis_name]][["estimates"]]
+    print(names(main_year))
+    print(names(mainyearminus2))
+    print(names(mainyearminus4))
+    #districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
+    #districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
+    #districts_full[i, ] <- districts[[dis_name]][["estimates"]]
   }
   return(districts_full)
 }
