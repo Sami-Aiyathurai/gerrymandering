@@ -1,5 +1,10 @@
 ## NEVADA
 
+nv_cand <- import("nv_candidates.csv")
+nv_cand <- nv_cand %>%
+  select(year, office, district, candidate, party)
+nv_cand$year <- as.numeric(nv_cand$year)
+
 ## LOADING DATA
 
 open_elections_factory_nv <- function(state) {
@@ -37,49 +42,102 @@ generate_data_nv <- function(oe_data){
 nv_data <- open_elections_factory_nv("nv")
 nv_data <- generate_data_nv(nv_data)
 
-nv_2022 <- access_state_year("2022", nv_data)
-cand_nv_2022 <- as.list(unique(nv_2022$candidate))
+access_state_year <- function(year, data){
+  state_year <- data[[year]]
+  return(state_year)
+}
+
+sa_contest_all_nv <- function(data){ #mod function name
+  sa_contest_dfs<- list()
+  for(i in seq(2004, 2022, 2)){ #mod range to 2004
+    year <- toString(i)
+    year_data <- access_state_year(year, data)
+    yearnum <- as.character(unique(year_data$year))
+    print(yearnum)
+    year_data$contest_dem <- as.integer(length(year_data))
+    year_data$contest_rep <- as.integer(length(year_data))
+    year_data <- nv_cand %>% # overwriting year data with joined candidate data for that year
+      filter(year == yearnum) %>%
+      full_join(year_data) %>%
+      mutate(votes = ifelse(is.na(votes), 0, votes))
+    year_data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
+    year_data$contest_rep <- ifelse(data$party == "REP", 1, 0)
+    # print(str(year_data))
+    # sa_contest_dfs[[year]] <- contest_di_co(year_data) ## using same contest_di as CO
+  }
+  return(year_data)
+  #return(sa_contest_dfs)
+}
+
+contested_nv <- sa_contest_all_nv(nv_data)
+
+# nv_2022 <- access_state_year("2022", nv_data)
+# cand_nv_2022 <- as.list(unique(nv_2022$candidate))
+
+## Matching Candidates! this is only going through 2016 for now bc of formatting issues
+
+nv_2004 <- access_state_year("2004", nv_data)
+nv_cand_2004 <- nv_cand %>%
+  filter(year == 2004) %>%
+  full_join(nv_2004)
+
+nv_2006 <- access_state_year("2006", nv_data)
+nv_cand_2006 <- nv_cand %>%
+  filter(year == 2006) %>%
+  full_join(nv_2006)
+
+nv_2008 <- access_state_year("2008", nv_data)
+nv_cand_2008 <- nv_cand %>%
+  filter(year == 2008) %>%
+  full_join(nv_2008)
+
+nv_2010 <- access_state_year("2010", nv_data)
+nv_cand_2010 <- nv_cand %>%
+  filter(year == 2010) %>%
+  full_join(nv_2010)
+
+nv_2012 <- access_state_year("2012", nv_data)
+nv_cand_2012 <- nv_cand %>%
+  filter(year == 2012) %>%
+  full_join(nv_2012)
+
+nv_2014 <- access_state_year("2014", nv_data)
+nv_cand_2014 <- nv_cand %>%
+  filter(year == 2014) %>%
+  full_join(nv_2014)
+
+nv_2016 <- access_state_year("2016", nv_data)
+nv_cand_2016 <- nv_cand %>%
+  filter(year == 2016) %>%
+  full_join(nv_2016)
+
+nv2_data <- rbind(nv_cand_2004, nv_cand_2006, nv_cand_2008, nv_cand_2010, nv_cand_2012,
+                     nv_cand_2014, nv_cand_2016)
+nv2_data <- nv2_data %>%
+  mutate(votes = ifelse(is.na(votes), 0, votes))
+
+## Uncontested mods
 
 
 
 
 
 
-nv_2008_sh_parties <- data.frame(
-  candidate = c("Marilyn Kirkpatrick", "Linda West Myers",
-                "Carlos Blumberg", "John Hambrick",
-                "Peggy Pierce", "Eric Morelli",
-                "Craig Ballew", "Richard McArthur",
-                "Marilyn Dondero Loop", "Donna Toussaint",
-                "Harvey Munford", "LisaMarie Johnson",
-                "Morse Arberry, Jr", "Geraldine Lewis",
-                "Barbara Buckley", "Kevin Child",
-                "Richard 'Tick' Segerblom", "Jefferson Lee",
-                "Joe Hogan", "Mitch Hostmeyer",
-                "Ruben Kihuen", "Ken Upp",
-                "James Ohrenschall", "Dallas Augustine",
-                ),
-  party = c("DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP",
-            "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP",
-            "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP",
-            "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP",
-            "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP",
-            "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP", "DEM", "REP",
-            "DEM", "REP", "DEM", "REP", "DEM", "REP"
 
-            ),
-  district = c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8,
-               9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14,
-               15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20,
-               21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
-               27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32,
-               33, 33, 34, 34, 35, 35, 36, 36, 37, 37, 38, 38,
-               39, 39, 40, 40, 41, 41, 42, 42), --- 84 values
-  office = c("State House", "State House")
-)
 
-nv_2008_sh <- data.frame(candidate = length(1:42),
-                         party = length(1:42),
-                         district = length(1:42),
-                         office = "State House"
-)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

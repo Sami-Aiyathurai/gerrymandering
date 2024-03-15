@@ -201,7 +201,6 @@ year_baseline_data <- function(year, data) {
   un_districts_main_year <- check_districts(uncon_main_year)
   districts <- list()
   ve_list <- list()
-  #print(un_districts_main_year) # un_districts_main_year should be a list of all uncontested districts
 
   for (i in un_districts_main_year) {
     temp <- uncon_main_year %>%
