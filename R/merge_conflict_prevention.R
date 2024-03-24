@@ -163,7 +163,6 @@ district_func_co <- function(x, y) {
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") #%>%
-  #dplyr::filter(.data[["office"]] == "State House" | .data[["office"]] == "State Representative")
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
   return(district_x_year)

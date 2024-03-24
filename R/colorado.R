@@ -1,9 +1,25 @@
 ## Colorado!!
 
-## Check data functions
-
-## Taking a break from CO: there's data prep work that needs to be done to make every year the same
-## removing certain columns, renaming variables --> what's the best place do do that??
+variable_prep <- function(data) {
+  data$party[data$party == "Democratic"] <- "DEM"
+  data$party[data$party == "Democrat"] <- "DEM"
+  data$party[data$party == "Democratic Party"] <- "DEM"
+  data$party[data$party == "Republican"] <- "REP"
+  data$party[data$party == "Republican Party"] <- "REP"
+  data$party[data$party == "Dem"] <- "DEM"
+  data$party[data$party == "Rep"] <- "REP"
+  data$office[data$office == "State Representative"] <- "State House"
+  data$office[data$office == "State Assembly"] <- "State House"
+  data$office[data$office == "Senate"] <- "U.S. Senate"
+  data$office[data$office == "US Senate"] <- "U.S. Senate"
+  data$precinct <- as.character(data$precinct)
+  data$votes <- as.integer(data$votes)
+  data$district <- as.numeric(data$district)
+  data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
+  data <- data %>%
+    select(county, precinct, office, district, party, candidate, votes)
+  return(data)
+}
 
 open_elections_factory_co <- function(state) { # 2004-2022
   dates = c("2004"="20041106", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
@@ -48,43 +64,7 @@ access_state_year <- function(year, data){
 co_data <- open_elections_factory_co("co")
 co_data <- generate_data_co(co_data)
 
-# 2004: 10 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-# 2006: 10 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-# 2008: 10 vars -- county (chr), precinct (chr), office (chr), district (chr), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-# 2010: 14 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num), poll_votes, mail_votes, early_votes, provisional_votes
-  # where votes = the others
-# 2012: 10 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-# 2014: 12 vars -- county (chr), precinct (chr), office (chr), district (num), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num), yes_votes, no_votes
-# 2016: 10 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-# 2018: 10 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-# 2020: 12 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num), yes_votes(int), no_votes(int)
-# 2022: 10 vars -- county (chr), precinct (chr), office (chr), district (int), party (chr), candidate (chr), votes (int), contest_dem (num), contest_rep (num), year (num)
-
-variable_prep <- function(data) {
-  data$party[data$party == "Democratic"] <- "DEM"
-  data$party[data$party == "Democrat"] <- "DEM"
-  data$party[data$party == "Democratic Party"] <- "DEM"
-  data$party[data$party == "Republican"] <- "REP"
-  data$party[data$party == "Republican Party"] <- "REP"
-  data$party[data$party == "Dem"] <- "DEM"
-  data$party[data$party == "Rep"] <- "REP"
-  data$office[data$office == "State Representative"] <- "State House"
-  data$office[data$office == "State Assembly"] <- "State House"
-  data$office[data$office == "Senate"] <- "U.S. Senate"
-  data$office[data$office == "US Senate"] <- "U.S. Senate"
-  data$precinct <- as.character(data$precinct)
-  data$votes <- as.integer(data$votes)
-  data$district <- as.numeric(data$district)
-  data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
-  data <- data %>%
-    select(county, precinct, office, district, party, candidate, votes)
-  return(data)
-}
-
-
-
 ## CHECK OFFICES
-
 
 ## CHECK 2010 CO there's 14 variables where there should be 10, 2014 has 12, 2020 has 12
 # need to recode the contest_dem and contest_rep
@@ -106,17 +86,6 @@ contest_di_co <- function(year_data){
   return(full_sa_di)
 }
 
-precincts1 <- check_precincts(co_data[[1]])
-precincts2 <- check_precincts(co_data[[2]])
-precincts3 <- check_precincts(co_data[[3]])
-precincts4 <- check_precincts(co_data[[4]])
-precincts5 <- check_precincts(co_data[[5]])
-precincts6 <- check_precincts(co_data[[6]])
-precincts7 <- check_precincts(co_data[[7]])
-precincts8 <- check_precincts(co_data[[8]])
-precincts9 <- check_precincts(co_data[[9]])
-precincts10 <- check_precincts(co_data[[10]])
-
 sa_contest_all_co <- function(data){ #mod function name
   sa_contest_dfs<- list()
   for(i in seq(2004, 2022, 2)){ #mod range to 2004
@@ -127,9 +96,6 @@ sa_contest_all_co <- function(data){ #mod function name
   return(sa_contest_dfs)
 }
 
-co_data <- open_elections_factory_co("co")
-co_data <- generate_data_co(co_data)
-co_2004 <- access_state_year("2004", co_data)
 contested_co <- sa_contest_all_co(co_data)
 
 # can use the same filtering as MI (for statewide_master and filter_statewide)
@@ -139,13 +105,6 @@ contested_co <- sa_contest_all_co(co_data)
 co_2010 <- access_state_year("2010", co_data)
 co_2008 <- access_state_year("2008", co_data)
 statewide_co_2008 <- statewide_master_mi(co_2008)
-
-co_8_2008 <- co_2008 %>%
-  filter(office == "State House") %>%
-  filter(district == 8)
-
-df_co_2008 <- district_func_co(co_8_2008, statewide_co_2008)
-df_wi_2010 <- district_func(wi_3_2010, statewide_wi_2010)
 
 district_func_co <- function(x, y) {
   tv_sax_year <- total_vote_func(x)
@@ -167,9 +126,6 @@ district_func_co <- function(x, y) {
   return(district_x_year)
 
 }
-
-co_2008 <- year_baseline_data_co(2008, co_data)
-co_2010 <- year_baseline_data_co(2010, co_data)
 
 year_baseline_data_co <- function(year, data) {
   districts_full <- data.frame(District = 1:65, # changed from 1:99 to 1:65 for all of these
@@ -227,9 +183,6 @@ year_baseline_data_co <- function(year, data) {
   return(districts_full)
 }
 
-prelim_co_2008 <- year_baseline_data_co(2008, co_data)
-prelim_wi_2010 <- year_baseline_data(2010, wi_data)
-
 efficiency_gap_co <- function(full_votes, year) { #changed the default table
   mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
                       Total_seats = c(65, 65, 65, 65, 65, 65, 65, 65),
@@ -243,8 +196,8 @@ efficiency_gap_co <- function(full_votes, year) { #changed the default table
   Sdem <- wi_sa_year$Dem_seats[1]
   Srep <- wi_sa_year$Rep_seats[1]
   amended <- vote_prep(full_votes) %>%
-    dplyr::mutate(MI = "MI") %>% #changed from wi to mi
-    dplyr::group_by(.data[["MI"]]) %>%
+    dplyr::mutate(CO = "CO") %>% #changed from wi to mi
+    dplyr::group_by(.data[["CO"]]) %>%
     dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
                      total_rep = sum(.data[["Rep_votes"]]),
                      total_total = sum(.data[["total_votes"]]))
@@ -272,8 +225,8 @@ efficiency_gap_contested_co <- function(full_votes, year) {
   full_votes_cont <- full_votes %>%
     dplyr::filter(.data[["Contested"]] == "contested")
   amended <- vote_prep(full_votes_cont) %>%
-    dplyr::mutate(MI = "MI") %>%
-    dplyr::group_by(.data[["MI"]]) %>%
+    dplyr::mutate(CO = "CO") %>%
+    dplyr::group_by(.data[["CO"]]) %>%
     dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
                      total_rep = sum(.data[["Rep_votes"]]),
                      total_total = sum(.data[["total_votes"]]))
