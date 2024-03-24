@@ -43,7 +43,6 @@ generate_data <- function(oe_data){
 
 access_state_year_mi <- function(year, data){
   state_year <- data[[year]]
-
   return(state_year)
 }
 
@@ -95,13 +94,37 @@ filter_statewide_mi <- function(x) {
   return(x)
 }
 
+total_vote_func <- function(x) {
+  x <- x %>%
+    group_by(.data[["office"]]) %>%
+    summarize(total_votes = sum(.data[["votes"]]))
+  return(x)
+}
+
+total_2p_vote_func <- function(x) {
+  x <- x %>%
+    filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
+    group_by(.data[["office"]]) %>%
+    summarize(total_votes_2p = sum(.data[["votes"]]))
+  return(x)
+}
+
+vote_join <- function(x, y, z) {
+  x <- x %>%
+    left_join(y, by = "office") %>%
+    left_join(z, by = "office")
+  return(x)
+}
+
+check_districts <- function(x) {
+  x <- as.integer(unique(x$district))
+  return(x)
+}
+
 # x is the state assembly house data filtered for that year, y is the statewide data but where does x get created? Y gets created by statewide_master
 
 # x = sa_contest (product of sa_contest_all function on my_data)
 # y = statewide_master_mi (year requested statewide race info)
-
-contested_mi <- sa_contest_all_mi(mi_data)
-statewide_mi_2012 <- statewide_master_mi(access_state_year("2012",mi_data))
 
 district_func_mi <- function(x, y) {
   tv_sax_year <- total_vote_func(x)
@@ -116,8 +139,6 @@ district_func_mi <- function(x, y) {
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
-  print(names(statewide_x_year))
-  print(names(sax_year))
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
 }
@@ -164,9 +185,9 @@ year_baseline_data_mi <- function(year, data) {
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
 
-  main_year_state <- access_state_year_mi(myear, data)
-  main_minus_two <- access_state_year_mi(myearm2, data)
-  main_minus_four <- access_state_year_mi(myearm4, data)
+  main_year_state <- access_state_year(myear, data)
+  main_minus_two <- access_state_year(myearm2, data)
+  main_minus_four <- access_state_year(myearm4, data)
 
   statewide_main_year <- statewide_master_mi(main_year_state)
   statewide_main_minus_two <- statewide_master_mi(main_minus_two)
@@ -198,12 +219,9 @@ year_baseline_data_mi <- function(year, data) {
     main_year <- district_func_mi(temp, statewide_main_year) # district func mi
     mainyearminus2 <- district_func_mi(temp, statewide_main_minus_two) # district_func_mi
     mainyearminus4 <- district_func_mi(temp, statewide_main_minus_four) # district_func_mi
-    print(names(main_year))
-    print(names(mainyearminus2))
-    print(names(mainyearminus4))
-    #districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
-    #districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
-    #districts_full[i, ] <- districts[[dis_name]][["estimates"]]
+    districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
+    districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
+    districts_full[i, ] <- districts[[dis_name]][["estimates"]]
   }
   return(districts_full)
 }

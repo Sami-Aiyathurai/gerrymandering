@@ -199,6 +199,7 @@ year_baseline_data <- function(year, data) {
   }
 
   un_districts_main_year <- check_districts(uncon_main_year)
+  print(un_districts_main_year)
   districts <- list()
   ve_list <- list()
 
@@ -217,7 +218,9 @@ year_baseline_data <- function(year, data) {
   return(districts_full)
 }
 
-year_baseline_data(2010, wi_data)
+ybd_2010 <- year_baseline_data(2010, wi_data)
+ybd_2012 <- year_baseline_data(2012, wi_data)
+## make Sami fix this
 
 #' @param full_votes data frame produced by the year_baseline_data function
 vote_prep <- function(full_votes) {
@@ -296,5 +299,4 @@ efficiency_gap_contested <- function(full_votes, year) {
 #' @return A numeric vector, between -0.25 and 0.25 that estimates how gerrymandered the
 #' state assembly is.
 #'
-
 
