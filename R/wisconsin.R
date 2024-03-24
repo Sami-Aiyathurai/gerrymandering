@@ -1,14 +1,10 @@
-# MICHIGAN #
+## WISCONSIN
 
-## Nothing before 2008 for state legislative
-
-## Functions to load the data
-
-open_elections_factory_mi <- function(state) {
+open_elections_factory <- function(state) {
   dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
   temp1 <-paste("https://raw.githubusercontent.com/openelections/openelections-data-",state,"/master", sep = "")
-  if (state == "mi"){ # changed the state and __precinct
-    temp2 <- paste("__",state,"__general__precinct.csv", sep = "")
+  if (state == "wi"){
+    temp2 <- paste("__",state,"__general__ward.csv", sep = "")
   }else {
     stop("This package does not have the functionality for state: ", state)
   }
@@ -22,11 +18,6 @@ open_elections_factory_mi <- function(state) {
       data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
       data$contest_rep <- ifelse(data$party == "REP", 1, 0)
       data$year <- as.numeric(year)
-
-      if (year == 2022) {
-        data$votes <- as.numeric(data$votes)
-        data$votes <- as.integer(data$votes)
-      }
     }
     data
   }
@@ -34,27 +25,23 @@ open_elections_factory_mi <- function(state) {
 
 generate_data <- function(oe_data){
   dfs <- list()
-  for(i in seq(2000, 2022, 2)){
+  for(i in seq(2000, 2022, 2)){ # changed to include 2022
     year <- toString(i)
     dfs[[year]] <- oe_data(year)
   }
   return(dfs)
 }
 
-access_state_year_mi <- function(year, data){
+access_state_year <- function(year, data){
   state_year <- data[[year]]
   return(state_year)
 }
 
-mi_data <- open_elections_factory_mi("mi")
-mi_data <- generate_data(mi_data)
-
-## uncontested step 1 functions modified
-
-contest_di_mi <- function(year_data){
+# takes dataframe from access_state_year
+contest_di <- function(year_data){
   sa_data <- year_data %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
-    dplyr::filter(.data[["office"]] == "State House") # mod state assembly -> state house
+    dplyr::filter(.data[["office"]] == "State Assembly")
   di_data_sa <- sa_data %>%
     dplyr::group_by(district)  %>%
     dplyr::summarize(contest_d = sum(.data[["contest_dem"]]), contest_r = sum(.data[["contest_rep"]]))
@@ -65,35 +52,44 @@ contest_di_mi <- function(year_data){
     dplyr::left_join(di_data_sa, by=c('district'))
   return(full_sa_di)
 }
-
-sa_contest_all_mi <- function(data){
+# param is full data from generate data
+sa_contest_all<- function(data){
   sa_contest_dfs<- list()
-  for(i in seq(2000, 2022, 2)){
+  for(i in seq(2000, 2022, 2)){ # changed to include 2022
     year <- toString(i)
     year_data <- access_state_year(year, data)
-    sa_contest_dfs[[year]] <- contest_di_mi(year_data)
+    sa_contest_dfs[[year]] <- contest_di(year_data)
   }
   return(sa_contest_dfs)
 }
 
-## Data cleaning uncontested
+wi_data <- open_elections_factory("wi")
+wi_data <- generate_data(wi_data)
+contested_wi <- sa_contest_all(wi_data)
 
-statewide_master_mi <- function(x) { # create new func: statewide_master_mi
-  x <- filter_statewide_mi(x) # call filter_statewide_mi
+## run districts_baseline_func (none of these get mod)
+
+## data cleaning uncontested
+
+#' @param x data frame created by open_elections_factory and generate_data
+statewide_master <- function(x) {
+  x <- filter_statewide(x)
   y <- total_vote_func(x)
   z <- total_2p_vote_func(x)
   x <- vote_join(x, y, z)
   return(x)
 }
 
-filter_statewide_mi <- function(x) {
+#' @param x data frame created by open_elections_factory and generate_data
+filter_statewide <- function(x) {
   x <- x %>%
-    filter(.data[["office"]] == "U.S. Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" | # changed to include U.S. Senate
+    filter(.data[["office"]] == "Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" |
              .data[["office"]] == "Secretary of State" | .data[["office"]] == "Governor")
   #x <- x[-c(1, 5:6)]
   return(x)
 }
 
+#' @param x data frame created by open_elections_factory and generate_data
 total_vote_func <- function(x) {
   x <- x %>%
     group_by(.data[["office"]]) %>%
@@ -101,6 +97,7 @@ total_vote_func <- function(x) {
   return(x)
 }
 
+#' @param x data frame created by open_elections_factory and generate_data
 total_2p_vote_func <- function(x) {
   x <- x %>%
     filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
@@ -109,6 +106,10 @@ total_2p_vote_func <- function(x) {
   return(x)
 }
 
+#' all parties and two parties.
+#' @param x data frame created by open_elections_factory and generate_data
+#' @param y data frame created by total_vote_func
+#' @param z data frame created by total_vote_2p_func
 vote_join <- function(x, y, z) {
   x <- x %>%
     left_join(y, by = "office") %>%
@@ -116,42 +117,40 @@ vote_join <- function(x, y, z) {
   return(x)
 }
 
+#' @param x data frame returned by the contested or uncontested state assembly data
 check_districts <- function(x) {
   x <- as.integer(unique(x$district))
   return(x)
 }
 
-# x is the state assembly house data filtered for that year, y is the statewide data but where does x get created? Y gets created by statewide_master
-
-# x = sa_contest (product of sa_contest_all function on my_data)
-# y = statewide_master_mi (year requested statewide race info)
-
-district_func_mi <- function(x, y) {
+#' @param x data frame of state assembly by district, as established by for loops
+#' @param y data frame of statewide data for the given year
+district_func <- function(x, y) {
   tv_sax_year <- total_vote_func(x)
   tv2p_sax_year <- total_2p_vote_func(x)
   sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
-  wards_sax_year <- data.frame(precinct = check_precincts(x)) # did not change these variable names
+  wards_sax_year <- data.frame(ward = check_wards(x))
   statewide_x_year <- y %>%
-    dplyr::right_join(wards_sax_year, by = "precinct") # changed to precinct
-  statewide_x_year <- statewide_x_year[-(11:12)] # changed the indices
+    dplyr::right_join(wards_sax_year, by = "ward")
+  statewide_x_year <- statewide_x_year[-(12:13)] # this index chops off the total_votes and total_votes_2p columns!!
   tv_statewide_x_year <- total_vote_func(statewide_x_year)
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
-  print(names(statewide_x_year))
-  print(names(sax_year))
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
+  return(district_x_year)
+
 }
 
-district_func_mi(contested_mi, statewide_mi_2012)
-
-check_precincts <- function(x) { # remade this function to be precincts not wards, put into district_func
-  uprecinct <- (unique(x$precinct))
-  return(uprecinct)
+#' @param x data frame of wards in a given state assembly district
+check_wards <- function(x) {
+  uwards <- (unique(x$ward))
+  return(uwards)
 }
 
+#' @param x data frame of state assembly district data
 candidate_function <- function(x) {
   cand_x_year <- x %>%
     dplyr::group_by(.data[["candidate"]]) %>%
@@ -160,29 +159,19 @@ candidate_function <- function(x) {
     dplyr::left_join(cand_x_year, by = "candidate") %>%
     dplyr::mutate(prop = .data[["cand_total_votes"]]/.data[["total_votes_2p"]])
   return(x)
-} # stays the same
+}
 
+year_baseline_data <- function(year, data) {
+  districts_full <- data.frame(District = 1:99,
+                               Dem_votes = integer(length(1:99)),
+                               Rep_votes = integer(length(1:99)),
+                               Contested = character(length(1:99)))
 
-## District baseline func
-
-### - none of these need to change!!
-
-## baseline_data_generate
-
-sa_contest <- sa_contest_all_mi(mi_data)
-
-
-year_baseline_data_mi <- function(year, data) {
-  districts_full <- data.frame(District = 1:110, # changed from 1:99 to 1:110 for all of these
-                               Dem_votes = integer(length(1:110)),
-                               Rep_votes = integer(length(1:110)),
-                               Contested = character(length(1:110)))
   myear <- as.character(year)
   myearm2 <- as.character((year-2))
   myearm4 <- as.character((year-4))
 
-  full_sa_di <- sa_contest_all_mi(data)
-
+  full_sa_di <- sa_contest_all(data)
   main_year <- full_sa_di[[myear]]
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
@@ -191,9 +180,9 @@ year_baseline_data_mi <- function(year, data) {
   main_minus_two <- access_state_year(myearm2, data)
   main_minus_four <- access_state_year(myearm4, data)
 
-  statewide_main_year <- statewide_master_mi(main_year_state)
-  statewide_main_minus_two <- statewide_master_mi(main_minus_two)
-  statewide_main_minus_four <- statewide_master_mi(main_minus_four)
+  statewide_main_year <- statewide_master(main_year_state)
+  statewide_main_minus_two <- statewide_master(main_minus_two)
+  statewide_main_minus_four <- statewide_master(main_minus_four)
 
   contested_main_year <- main_year %>%
     dplyr::filter(.data[["contested"]] == "contested")
@@ -212,15 +201,16 @@ year_baseline_data_mi <- function(year, data) {
   un_districts_main_year <- check_districts(uncon_main_year)
   districts <- list()
   ve_list <- list()
+  #print(un_districts_main_year) # un_districts_main_year should be a list of all uncontested districts
 
   for (i in un_districts_main_year) {
     temp <- uncon_main_year %>%
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
     dis_name <- as.character(i)
-    main_year <- district_func_mi(temp, statewide_main_year) # district func mi
-    mainyearminus2 <- district_func_mi(temp, statewide_main_minus_two) # district_func_mi
-    mainyearminus4 <- district_func_mi(temp, statewide_main_minus_four) # district_func_mi
+    main_year <- district_func(temp, statewide_main_year)
+    mainyearminus2 <- district_func(temp, statewide_main_minus_two)
+    mainyearminus4 <- district_func(temp, statewide_main_minus_four)
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
     districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
     districts_full[i, ] <- districts[[dis_name]][["estimates"]]
@@ -228,21 +218,36 @@ year_baseline_data_mi <- function(year, data) {
   return(districts_full)
 }
 
-efficiency_gap_mi <- function(full_votes, year) { #changed the default table
-  mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
-                      Total_seats = c(110, 110, 110, 110, 110, 110, 110, 110),
-                      Dem_seats = c(67, 46, 51, 47, 47, 52, 52, 56),
-                      Rep_seats = c(43, 64, 59, 63, 63, 58, 58, 54)
+year_baseline_data(2010, wi_data)
+
+#' @param full_votes data frame produced by the year_baseline_data function
+vote_prep <- function(full_votes) {
+  total_votes <- full_votes %>%
+    dplyr::group_by(.data[["District"]]) %>%
+    dplyr::summarize(total_votes = sum(.data[["Dem_votes"]], .data[["Rep_votes"]]))
+  full_votes <- full_votes %>%
+    dplyr::left_join(total_votes, by = "District")
+  return(full_votes)
+}
+
+#' @param full_votes data frame as made by year_baseline_data function
+#' @param year a numeric vector as inputted by the user within the year range 2006-2020
+#' @export
+efficiency_gap <- function(full_votes, year) {
+  wi_sa <- data.frame(Year = c("2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
+                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99, 99),
+                      Dem_seats = c(47, 52, 39, 39, 39, 36, 35, 38, 35),
+                      Rep_seats = c(52, 47, 60, 60, 60, 63, 64, 61, 64)
   )
   myear <- as.character(year)
-  wi_sa_year <- mi_sa %>%
+  wi_sa_year <- wi_sa %>%
     dplyr::filter(.data[["Year"]] == myear)
   Stotal <- wi_sa_year$Total_seats[1]
   Sdem <- wi_sa_year$Dem_seats[1]
   Srep <- wi_sa_year$Rep_seats[1]
   amended <- vote_prep(full_votes) %>%
-    dplyr::mutate(MI = "MI") %>% #changed from wi to mi
-    dplyr::group_by(.data[["MI"]]) %>%
+    dplyr::mutate(WI = "WI") %>%
+    dplyr::group_by(.data[["WI"]]) %>%
     dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
                      total_rep = sum(.data[["Rep_votes"]]),
                      total_total = sum(.data[["total_votes"]]))
@@ -255,14 +260,19 @@ efficiency_gap_mi <- function(full_votes, year) { #changed the default table
   return(EG)
 }
 
-efficiency_gap_contested_mi <- function(full_votes, year) {
-  mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
-                      Total_seats = c(110, 110, 110, 110, 110, 110, 110, 110),
-                      Dem_seats = c(67, 46, 51, 47, 47, 52, 52, 56),
-                      Rep_seats = c(43, 64, 59, 63, 63, 58, 58, 54)
+#' @param full_votes A data frame of length 99, for each legislative district and
+#' and how they voted Democrat or Republican for a given year.
+#' @param year A character vector identifying the requested year. The user can
+#' input a numeric or integer vector, but the function will transform it into a character.
+#' @export
+efficiency_gap_contested <- function(full_votes, year) {
+  wi_sa <- data.frame(Year = c("2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
+                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99, 99),
+                      Dem_seats = c(47, 52, 39, 39, 39, 36, 35, 38, 35),
+                      Rep_seats = c(52, 47, 60, 60, 60, 63, 64, 61, 64)
   )
   myear <- as.character(year)
-  wi_sa_year <- mi_sa %>%
+  wi_sa_year <- wi_sa %>%
     dplyr::filter(.data[["Year"]] == myear)
   Stotal <- wi_sa_year$Total_seats[1]
   Sdem <- wi_sa_year$Dem_seats[1]
@@ -270,8 +280,8 @@ efficiency_gap_contested_mi <- function(full_votes, year) {
   full_votes_cont <- full_votes %>%
     dplyr::filter(.data[["Contested"]] == "contested")
   amended <- vote_prep(full_votes_cont) %>%
-    dplyr::mutate(MI = "MI") %>%
-    dplyr::group_by(.data[["MI"]]) %>%
+    dplyr::mutate(WI = "WI") %>%
+    dplyr::group_by(.data[["WI"]]) %>%
     dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
                      total_rep = sum(.data[["Rep_votes"]]),
                      total_total = sum(.data[["total_votes"]]))
@@ -283,4 +293,9 @@ efficiency_gap_contested_mi <- function(full_votes, year) {
   EG <- as.numeric(Vmargin - Smargin)
   return(EG)
 }
+
+#' @return A numeric vector, between -0.25 and 0.25 that estimates how gerrymandered the
+#' state assembly is.
+#'
+
 
