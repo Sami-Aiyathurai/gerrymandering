@@ -4,6 +4,26 @@
 
 ## Taking a break from CO: there's data prep work that needs to be done to make every year the same
 ## removing certain columns, renaming variables --> what's the best place do do that??
+variable_prep <- function(data) {
+  data$party[data$party == "Democratic"] <- "DEM"
+  data$party[data$party == "Democrat"] <- "DEM"
+  data$party[data$party == "Democratic Party"] <- "DEM"
+  data$party[data$party == "Republican"] <- "REP"
+  data$party[data$party == "Republican Party"] <- "REP"
+  data$party[data$party == "Dem"] <- "DEM"
+  data$party[data$party == "Rep"] <- "REP"
+  data$office[data$office == "State Representative"] <- "State House"
+  data$office[data$office == "State Assembly"] <- "State House"
+  data$office[data$office == "Senate"] <- "U.S. Senate"
+  data$office[data$office == "US Senate"] <- "U.S. Senate"
+  data$precinct <- as.character(data$precinct)
+  data$votes <- as.integer(data$votes)
+  data$district <- as.numeric(data$district)
+  data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
+  data <- data %>%
+    select(county, precinct, office, district, party, candidate, votes)
+  return(data)
+}
 
 open_elections_factory_co <- function(state) { # 2004-2022
   dates = c("2004"="20041106", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
@@ -245,6 +265,8 @@ efficiency_gap_co <- function(full_votes, year) { #changed the default table
   amended <- vote_prep(full_votes) %>%
     dplyr::mutate(MI = "MI") %>% #changed from wi to mi
     dplyr::group_by(.data[["MI"]]) %>%
+    dplyr::mutate(CO = "CO") %>% #changed from wi to mi
+    dplyr::group_by(.data[["CO"]]) %>%
     dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
                      total_rep = sum(.data[["Rep_votes"]]),
                      total_total = sum(.data[["total_votes"]]))
@@ -274,6 +296,8 @@ efficiency_gap_contested_co <- function(full_votes, year) {
   amended <- vote_prep(full_votes_cont) %>%
     dplyr::mutate(MI = "MI") %>%
     dplyr::group_by(.data[["MI"]]) %>%
+    dplyr::mutate(CO = "CO") %>%
+    dplyr::group_by(.data[["CO"]]) %>%
     dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
                      total_rep = sum(.data[["Rep_votes"]]),
                      total_total = sum(.data[["total_votes"]]))
