@@ -6,7 +6,7 @@ library(rio)
 
 nv_cand <- import("nv_candidates.csv")
 nv_cand <- nv_cand %>%
-  select(year, office, district, candidate, party)
+  dplyr::select(year, office, district, candidate, party)
 nv_cand$year <- as.numeric(nv_cand$year)
 
 ## LOADING DATA
@@ -19,20 +19,22 @@ open_elections_factory_nv <- function(state) {
   }else {
     stop("This package does not have the functionality for state: ", state)
   }
-
   read <- function(year){
     date <- dates[year]
     temp3 <- paste(date,temp2, sep = "")
     url <- file.path(temp1 , year, temp3)
     data <- utils::read.csv(url)
-    for (district in data) {
-      #data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
-      #data$contest_rep <- ifelse(data$party == "REP", 1, 0)
-      data$year <- as.numeric(year)
-    }
+    #for (district in data) {
+      if (as.numeric(year) < 2016) {
+        data <- nv_prep(data, year)
+      }
+
+    #}
     data
   }
 }
+
+
 
 generate_data_nv <- function(oe_data){
   dfs <- list()
@@ -46,9 +48,23 @@ generate_data_nv <- function(oe_data){
 nv_data <- open_elections_factory_nv("nv")
 nv_data <- generate_data_nv(nv_data)
 
-sa_contest_all_co <- function(data){ #original sa_contest_all
+nv_prep <- function(nv_year, year) {
+  yearc <- as.character(year)
+  nv_year$year <- as.numeric(year)
+  cands_year <- nv_cand %>%
+    filter(year == yearc)
+  print(head(cands_year))
+  print(head(nv_year))
+  nv_year <- nv_year %>%
+    inner_join(cands_year, by=c("year", "office", "district", "candidate"))
+  nv_year$contest_dem <- ifelse(nv_year$party == "DEM", 1, 0)
+  nv_year$contest_rep <- ifelse(nv_year$party == "REP", 1, 0)
+  return(nv_year)
+}
+
+sa_contest_all_co <- function(data){ #original sa_contest_all, can also just use the CO one as they both start 2004
   sa_contest_dfs<- list()
-  for(i in seq(2004, 2022, 2)){ #mod range to 2004
+  for(i in seq(2004, 2014, 2)){ #mod range to 2004-2014 for now
     year <- toString(i)
     year_data <- access_state_year(year, data)
     sa_contest_dfs[[year]] <- contest_di_co(year_data)
@@ -56,46 +72,20 @@ sa_contest_all_co <- function(data){ #original sa_contest_all
   return(sa_contest_dfs)
 }
 
-nv_2008 <- access_state_year("2008", nv_data)
-nv_cand_08 <- nv_cand %>%
-  filter(year == 2008)
+nv_contested <- sa_contest_all_co(nv_data)
 
-nv_08 <- nv_2008 %>%
-  right_join(nv_cand_08, by=c("candidate", "office", "year", "district"))
 
-sa_contest_all_nv <- function(data){ #mod function name
-  sa_contest_dfs<- list()
-  for(i in seq(2004, 2022, 2)){ #mod range to 2004
-    year <- toString(i)
-    year_data <- access_state_year(year, data)
-    yearnum <- as.character(unique(year_data$year))
-
-    cand_year <- nv_cand %>%
-      filter(year == yearnum)
-    joined <- year_data %>%
-      right_join(cand_year, by=c("candidate", "office", "year", "district"))
-
-    joined$contest_dem <- as.integer(length(joined))
-    joined$contest_rep <- as.integer(length(joined))
-
-    joined$contest_dem <- ifelse(joined$party == "DEM", 1, 0)
-    joined$contest_rep <- ifelse(joined$party == "REP", 1, 0)
-    sa_contest_dfs[[year]] <- contest_di_co(year_data) ## using same contest_di as CO
-  }
-  return(sa_contest_dfs)
-}
+## copy paste new form of sa_contest_all_nv
 
 contested_nv <- sa_contest_all_nv(nv_data)
 
-# nv_2022 <- access_state_year("2022", nv_data)
-# cand_nv_2022 <- as.list(unique(nv_2022$candidate))
 
 ## How am I going to deal with 2018, 2020, 2022
-
-
-nv_2018 <- nv_data[[8]]
-nv_2020 <- nv_data[[9]]
-nv_2022 <- nv_data[[10]]
+nv_2014 <- nv_data[[6]] # names formatted as proper nouns, first name last name
+nv_2016 <- nv_data[[7]] # can set to all caps, remove commas between
+nv_2018 <- nv_data[[8]] # can set to all caps, remove commas between
+nv_2020 <- nv_data[[9]] # can set to all caps, remove commas between
+nv_2022 <- nv_data[[10]] # can set to all caps, remove commas between
 
 cand_2018 <- as.data.frame(unique(nv_2018$candidate))
 cand_2020 <- as.data.frame(unique(nv_2020$candidate))

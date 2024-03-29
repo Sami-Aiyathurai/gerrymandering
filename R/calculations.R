@@ -74,3 +74,7 @@ mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
 
 egs <- rbind(wi_egs, mi_egs, co_egs)
 
+write.csv(egs, "C:\\Users\\mzelloe\\Desktop\\egs.csv", row.names=FALSE)
+
+
+
