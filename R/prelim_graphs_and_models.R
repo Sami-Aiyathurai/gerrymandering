@@ -1,14 +1,20 @@
 ## Preliminary modeling
 
+library(rio)
+
 states <- import("StatesAndCyclesData_production-20240301a.csv")
 egs$Year <- as.numeric(egs$Year)
 egs$Year <- as.integer(egs$Year)
 
 
 mod_state <- states %>%
-  select(c(State, `Cycle Year`, Level, Seats, Institution, `Party Control`, Governor)) %>%
+  dplyr::select(State, `Cycle Year`, Level, Seats, Institution, `Party Control`, Governor, `Plan Status`) %>%
   filter(Level == "State Lower") %>%
-  rename("Year" = "Cycle Year")
+  rename("Year" = "Cycle Year") %>%
+  rename("Legislature_Control" = "Party Control") %>%
+  mutate(Trifecta = "1") %>%
+  mutate(State_Supreme_method = "1") %>%
+  rename("Status" = "Plan Status")
 
 egs_mod <- egs %>%
   left_join(mod_state, by = c("Year" = "Year", "State" = "State"))
@@ -24,7 +30,74 @@ egs_mod$Institution <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2020, "Inde
 egs_mod$Institution <- ifelse(egs_mod$State == "CO" & egs_mod$Year < 2020, "Politician commission", egs_mod$Institution)
 egs_mod$Seats <- ifelse(egs_mod$State == "MI", 110, egs_mod$Seats)
 egs_mod$Institution <- ifelse(egs_mod$State == "MI" & egs_mod$Year < 2020, "Legislature", egs_mod$Institution)
+egs_mod$Seats <- ifelse(egs_mod$State == "PA", 203, egs_mod$Seats)
+egs_mod$Institution <- ifelse(egs_mod$State == "PA", "Politician commission", egs_mod$Institution)
 
+## GOV party each year
+
+egs_mod$Governor <- ifelse(egs_mod$State == "WI" & egs_mod$Year < 2010, "D", egs_mod$Governor)
+egs_mod$Governor <- ifelse(egs_mod$State == "WI" & egs_mod$Year > 2010, "R", egs_mod$Governor)
+egs_mod$Governor <- ifelse(egs_mod$State == "WI" & egs_mod$Year > 2016, "D", egs_mod$Governor)
+
+egs_mod$Governor <- ifelse(egs_mod$State == "MI" & egs_mod$Year < 2010, "D", egs_mod$Governor)
+egs_mod$Governor <- ifelse(egs_mod$State == "MI" & egs_mod$Year > 2010, "R", egs_mod$Governor)
+egs_mod$Governor <- ifelse(egs_mod$State == "MI" & egs_mod$Year > 2018, "D", egs_mod$Governor)
+
+egs_mod$Governor <- ifelse(egs_mod$State == "CO" & egs_mod$Year <= 2022, "D", egs_mod$Governor)
+
+egs_mod$Governor <- ifelse(egs_mod$State == "PA" & egs_mod$Year < 2010, "D", egs_mod$Governor)
+egs_mod$Governor <- ifelse(egs_mod$State == "PA" & egs_mod$Year > 2008, "R", egs_mod$Governor)
+egs_mod$Governor <- ifelse(egs_mod$State == "PA" & egs_mod$Year > 2014, "D", egs_mod$Governor)
+
+
+## Legislature control
+
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "WI" & egs_mod$Year < 2010, "D", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "WI" & egs_mod$Year > 2008, "R", egs_mod$Legislature_Control)
+
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "MI" & egs_mod$Year < 2010, "Split", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "MI" & egs_mod$Year > 2008, "R", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "MI" & egs_mod$Year > 2020, "D", egs_mod$Legislature_Control)
+
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "CO" & egs_mod$Year < 2010, "D", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2008, "Split", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2010, "D", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2012, "Split", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2016, "D", egs_mod$Legislature_Control)
+
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "PA" & egs_mod$Year < 2010, "Split", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "PA" & egs_mod$Year > 2008, "R", egs_mod$Legislature_Control)
+egs_mod$Legislature_Control <- ifelse(egs_mod$State == "PA" & egs_mod$Year > 2020, "Split", egs_mod$Legislature_Control)
+
+
+## make column for trifecta status
+
+egs_mod$Trifecta <- ifelse(egs_mod$State == "WI" & egs_mod$Year < 2010, "D", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "WI" & egs_mod$Year > 2008, "R", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "WI" & egs_mod$Year > 2016, "Split", egs_mod$Trifecta)
+
+egs_mod$Trifecta <- ifelse(egs_mod$State == "MI" & egs_mod$Year < 2010, "Split", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "MI" & egs_mod$Year > 2008, "R", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "MI" & egs_mod$Year > 2018, "Split", egs_mod$Trifecta)
+
+egs_mod$Trifecta <- ifelse(egs_mod$State == "CO" & egs_mod$Year < 2010, "D", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2008, "Split", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "CO" & egs_mod$Year > 2016, "D", egs_mod$Trifecta)
+
+egs_mod$Trifecta <- ifelse(egs_mod$State == "PA" & egs_mod$Year < 2010, "Split", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "PA" & egs_mod$Year > 2008, "R", egs_mod$Trifecta)
+egs_mod$Trifecta <- ifelse(egs_mod$State == "PA" & egs_mod$Year > 2012, "Split", egs_mod$Trifecta)
+
+## State supreme court method
+
+egs_mod$State_Supreme_method <- ifelse(egs_mod$State == "WI", "Nonpartisan Election", egs_mod$State_Supreme_method)
+egs_mod$State_Supreme_method <- ifelse(egs_mod$State == "MI", "Michigan Method", egs_mod$State_Supreme_method)
+egs_mod$State_Supreme_method <- ifelse(egs_mod$State == "CO", "Governor Assisted Appointment", egs_mod$State_Supreme_method)
+egs_mod$State_Supreme_method <- ifelse(egs_mod$State == "PA", "Partisan Election", egs_mod$State_Supreme_method)
+
+
+write.csv(egs_mod, "C:\\Users\\mzelloe\\Desktop\\egs_mod2.csv", row.names=FALSE)
+## need to mod party control, governor, and method of judicial elections, partisan court composition if applicable
 
 ggplot(egs_mod, aes(x=Year, y=Efficiency_gap)) +
   geom_point(aes(color=Institution)) +
