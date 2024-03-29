@@ -41,7 +41,7 @@ generate_data <- function(oe_data){
   return(dfs)
 }
 
-access_state_year_mi <- function(year, data){
+access_state_year <- function(year, data){
   state_year <- data[[year]]
   return(state_year)
 }
