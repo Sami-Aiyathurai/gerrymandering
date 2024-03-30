@@ -8,13 +8,13 @@ egs$Year <- as.integer(egs$Year)
 
 
 mod_state <- states %>%
-  dplyr::select(State, `Cycle Year`, Level, Seats, Institution, `Party Control`, Governor, `Plan Status`) %>%
+  dplyr::select(State, `Cycle Year`, Level, Seats, Institution, `Party Control`, Governor) %>% #`Plan Status`) %>%
   filter(Level == "State Lower") %>%
   rename("Year" = "Cycle Year") %>%
   rename("Legislature_Control" = "Party Control") %>%
   mutate(Trifecta = "1") %>%
-  mutate(State_Supreme_method = "1") %>%
-  rename("Status" = "Plan Status")
+  mutate(State_Supreme_method = "1") #%>%
+  # rename("Status" = "Plan Status")
 
 egs_mod <- egs %>%
   left_join(mod_state, by = c("Year" = "Year", "State" = "State"))
@@ -96,7 +96,7 @@ egs_mod$State_Supreme_method <- ifelse(egs_mod$State == "CO", "Governor Assisted
 egs_mod$State_Supreme_method <- ifelse(egs_mod$State == "PA", "Partisan Election", egs_mod$State_Supreme_method)
 
 
-write.csv(egs_mod, "C:\\Users\\mzelloe\\Desktop\\egs_mod2.csv", row.names=FALSE)
+write.csv(egs_mod, "C:\\Users\\molly\\Desktop\\egs_mod2.csv", row.names=FALSE)
 ## need to mod party control, governor, and method of judicial elections, partisan court composition if applicable
 
 ggplot(egs_mod, aes(x=Year, y=Efficiency_gap)) +

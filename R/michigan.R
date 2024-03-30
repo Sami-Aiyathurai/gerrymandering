@@ -139,6 +139,8 @@ district_func_mi <- function(x, y) {
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
+  print(names(statewide_x_year))
+  print(names(sax_year))
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
 }
@@ -281,3 +283,4 @@ efficiency_gap_contested_mi <- function(full_votes, year) {
   EG <- as.numeric(Vmargin - Smargin)
   return(EG)
 }
+

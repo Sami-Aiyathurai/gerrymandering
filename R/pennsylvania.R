@@ -13,11 +13,10 @@ open_elections_factory_pa <- function(state) {
   }else {
     stop("This package does not have the functionality for state: ", state)
   }
-
   read <- function(year){
-    date <- dates[year]
-    temp3 <- paste(date,temp2, sep = "")
-    temp4 <- paste("https://www.dos.pa.gov/VotingElections/BEST/stats/Documents/ElectionReturns_",date, "_General_PrecinctReturns.txt", sep="")
+  date <- dates[year]
+  temp3 <- paste(date,temp2, sep = "")
+  temp4 <- paste("https://www.dos.pa.gov/VotingElections/BEST/stats/Documents/ElectionReturns_",date, "_General_PrecinctReturns.txt", sep="")
     url <- file.path(temp1 , year, temp3)
     url2 <- file.path(temp4)
     if (year <= 2014) {
@@ -75,8 +74,7 @@ open_elections_factory_pa <- function(state) {
   }
 }
 
-
-generate_data <- function(oe_data){
+generate_data_pa <- function(oe_data){
   dfs <- list()
   for(i in seq(2004, 2022, 2)){
     year <- toString(i)
@@ -85,8 +83,15 @@ generate_data <- function(oe_data){
   return(dfs)
 }
 
+access_state_year <- function(year, data){
+  state_year <- data[[year]]
+  return(state_year)
+}
+
 pa_data <- open_elections_factory_pa("pa")
-pa_data <- generate_data(pa_data) # can pull 2022 data from PA secretary of state directly
+pa_data <- generate_data_pa(pa_data)
+
+## ORGANIZING AND TIDYING PA 4 aka 2008
 
 ## 2004
 
@@ -991,7 +996,6 @@ pa_2002_function <- function(pa_year) {
 
   return(mod_year)
 }
-
 
 
 
