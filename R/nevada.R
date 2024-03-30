@@ -4,10 +4,11 @@
 
 library(rio)
 
-nv_cand <- import("nv_candidates.csv")
+nv_cand <- import("nv_cand.csv")
 nv_cand <- nv_cand %>%
   dplyr::select(year, office, district, candidate, party)
 nv_cand$year <- as.numeric(nv_cand$year)
+nv_precincts <- import("nv_precincts_statewide.xlsx")
 
 ## LOADING DATA
 
@@ -48,21 +49,21 @@ generate_data_nv <- function(oe_data){
 nv_data <- open_elections_factory_nv("nv")
 nv_data <- generate_data_nv(nv_data)
 
+
 nv_prep <- function(nv_year, year) {
   yearc <- as.character(year)
   nv_year$year <- as.numeric(year)
   cands_year <- nv_cand %>%
     filter(year == yearc)
-  print(head(cands_year))
-  print(head(nv_year))
   nv_year <- nv_year %>%
     inner_join(cands_year, by=c("year", "office", "district", "candidate"))
   nv_year$contest_dem <- ifelse(nv_year$party == "DEM", 1, 0)
   nv_year$contest_rep <- ifelse(nv_year$party == "REP", 1, 0)
+  nv_year$candidate <- str_to_upper(nv_year$candidate)
   return(nv_year)
 }
 
-sa_contest_all_co <- function(data){ #original sa_contest_all, can also just use the CO one as they both start 2004
+sa_contest_all_nv <- function(data){ #original sa_contest_all, can also just use the CO one as they both start 2004
   sa_contest_dfs<- list()
   for(i in seq(2004, 2014, 2)){ #mod range to 2004-2014 for now
     year <- toString(i)
@@ -74,13 +75,65 @@ sa_contest_all_co <- function(data){ #original sa_contest_all, can also just use
 
 nv_contested <- sa_contest_all_co(nv_data)
 
-
 ## copy paste new form of sa_contest_all_nv
 
 contested_nv <- sa_contest_all_nv(nv_data)
 
+## dealing with the precincts not being specific
+
+nv_2010 <- nv_data[[4]]
+
+nv_2010_sh <- nv_2010 %>%
+  filter(office == "State House")
+
+## formatting NV precincts to get it to work
+
+names(nv_precincts)[names(nv_precincts) == "...1"] <- "county_code"
+names(nv_precincts)[names(nv_precincts) == "...3"] <- "county_name"
+names(nv_precincts)[names(nv_precincts) == "...6"] <- "registered_precinct"
+names(nv_precincts)[names(nv_precincts) == "...7"] <- "congressional_district"
+names(nv_precincts)[names(nv_precincts) == "...8"] <- "senate_district"
+names(nv_precincts)[names(nv_precincts) == "...10"] <- "house_district"
+
+nv_precincts <- nv_precincts %>%
+  select(county_code, county_name, registered_precinct, congressional_district, senate_district, house_district) %>%
+  filter(!is.na(registered_precinct))
+nv_precincts <- nv_precincts[-1,]
+
+nv_precincts$county_name <- str_to_upper(nv_precincts$county_name)
+nv_precincts$registered_precinct <- as.numeric(nv_precincts$registered_precinct)
+
+for (i in nv_precincts) {
+  nv_precincts$precinct <- paste0(nv_precincts$county_name, nv_precincts$registered_precinct)
+}
+
+## Clark 2010 precinct 130 assigned to districts 22 and 21
+
+hd21_22 <- nv_precincts %>%
+  filter(house_district == 21 | house_district == 22)
+
+nv_2010_hd21_22 <- nv_2010 %>%
+  filter(office == "State House") %>%
+  filter(district == 21 | district == 22)
+
+p2004 <- data.frame(unique(nv_2004$precinct)) # 598 observations
+p2006 <- data.frame(unique(nv_2006$precinct)) #
+p2008 <- data.frame(unique(nv_2008$precinct))
+p2010 <- data.frame(unique(nv_2010$precinct))
+p2012 <- data.frame(unique(nv_2012$precinct))
+p2014 <- data.frame(unique(nv_2014$precinct))
+p2016 <- data.frame(unique(nv_2016$precinct))
+p2018 <- data.frame(unique(nv_2018$precinct))
+p2020 <- data.frame(unique(nv_2020$precinct))
+p2022 <- data.frame(unique(nv_2022$precinct))
+
+
 
 ## How am I going to deal with 2018, 2020, 2022
+nv_2004 <- nv_data[[1]]
+nv_2006 <- nv_data[[2]]
+nv_2008 <- nv_data[[3]]
+nv_2012 <- nv_data[[5]]
 nv_2014 <- nv_data[[6]] # names formatted as proper nouns, first name last name
 nv_2016 <- nv_data[[7]] # can set to all caps, remove commas between
 nv_2018 <- nv_data[[8]] # can set to all caps, remove commas between
@@ -98,6 +151,11 @@ for (i in seq_along(cand_2018)) {
 
 ## this worked for 2018 but not 2020 nor 2022 :/
 
+## I think I'm going to want to grepl this; anything before the space gets moved to front
+## anything after the space stays in the back, saving strings
+
+## GOAL MAKE ALL OF IT CAPPED
+
 for (i in seq_along(cand_2020)) {
   cand_2020[i] <- str_to_upper(cand_2020[i])
   return(cand_2020)
@@ -108,48 +166,11 @@ for (i in seq_along(cand_2022)) {
   return(cand_2022)
 }
 
-
-
-## Matching Candidates! this is only going through 2016 for now bc of formatting issues
-
-nv_2004 <- access_state_year("2004", nv_data)
-nv_cand_2004 <- nv_cand %>%
-  filter(year == 2004) %>%
-  full_join(nv_2004)
-
-nv_2006 <- access_state_year("2006", nv_data)
-nv_cand_2006 <- nv_cand %>%
-  filter(year == 2006) %>%
-  full_join(nv_2006)
-
+## OTHER MODS
 nv_2008 <- access_state_year("2008", nv_data)
-nv_cand_2008 <- nv_cand %>%
-  filter(year == 2008) %>%
-  full_join(nv_2008)
+statewide_nv08 <- filter_statewide_mi(nv_2008)
 
-nv_2010 <- access_state_year("2010", nv_data)
-nv_cand_2010 <- nv_cand %>%
-  filter(year == 2010) %>%
-  full_join(nv_2010)
+nv08d4 <- nv_2008 %>%
+  filter(office == "State House") %>%
+  filter(precinct == 130)
 
-nv_2012 <- access_state_year("2012", nv_data)
-nv_cand_2012 <- nv_cand %>%
-  filter(year == 2012) %>%
-  full_join(nv_2012)
-
-nv_2014 <- access_state_year("2014", nv_data)
-nv_cand_2014 <- nv_cand %>%
-  filter(year == 2014) %>%
-  full_join(nv_2014)
-
-nv_2016 <- access_state_year("2016", nv_data)
-nv_cand_2016 <- nv_cand %>%
-  filter(year == 2016) %>%
-  full_join(nv_2016)
-
-nv2_data <- rbind(nv_cand_2004, nv_cand_2006, nv_cand_2008, nv_cand_2010, nv_cand_2012,
-                  nv_cand_2014, nv_cand_2016)
-nv2_data <- nv2_data %>%
-  mutate(votes = ifelse(is.na(votes), 0, votes))
-
-## Uncontested mods

@@ -199,7 +199,6 @@ year_baseline_data <- function(year, data) {
   }
 
   un_districts_main_year <- check_districts(uncon_main_year)
-  print(un_districts_main_year)
   districts <- list()
   ve_list <- list()
 
