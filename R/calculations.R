@@ -6,7 +6,6 @@ library(tidyverse)
 
 wi_data <- open_elections_factory("wi")
 wi_data <- generate_data(wi_data)
-wi_contested <- sa_contest_all(wi_data)
 
 # there's something wonky happening in year_baseline_data with 2012 but I don't feel like figuring it out right now so I won't!
 
@@ -23,12 +22,10 @@ wisconsin <- function(year, ...) {
   return(wi_year)
 }
 
-
 ## Michigan
 
 mi_data <- open_elections_factory_mi("mi")
 mi_data <- generate_data(mi_data)
-mi_contested <- sa_contest_all_mi(mi_data)
 
 ## MI: each df has 10 variables: county, precinct, office, district, party, candidate, votes, contest_dem, contest_rep, year
 
@@ -50,6 +47,9 @@ michigan <- function(year,...) {
 
 ## CO
 
+co_data <- open_elections_factor_co("co")
+co_data <- generate_data_co(co_data)
+
 colorado <- function(year, ...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
@@ -66,6 +66,9 @@ colorado <- function(year, ...) {
 
 ## PA
 
+pa_data <- open_elections_factory_pa("pa")
+pa_data <- generate_data_co(pa_data)
+
 pennsylvania <- function(year, ...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
@@ -80,9 +83,6 @@ pennsylvania <- function(year, ...) {
   return(pa_year)
 }
 
-
-# I don't think MI 2022 works oh well it's because votes are coded as characters not integers
-
 wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2014),
                 wisconsin(2016), wisconsin(2018), wisconsin(2020), wisconsin(2022))
 
@@ -95,9 +95,7 @@ mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
 pa_egs <- rbind(pennsylvania(2008), pennsylvania(2010), pennsylvania(2012), pennsylvania(2014),
                 pennsylvania(2016), pennsylvania(2018), pennsylvania(2020), pennsylvania(2022))
 
-
 egs <- rbind(wi_egs, mi_egs, co_egs, pa_egs)
-
 
 
 write.csv(egs, "C:\\Users\\mzelloe\\Desktop\\egs.csv", row.names=FALSE)
