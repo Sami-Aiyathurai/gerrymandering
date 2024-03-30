@@ -74,7 +74,7 @@ open_elections_factory_pa <- function(state) {
   }
 }
 
-generate_data <- function(oe_data){
+generate_data_pa <- function(oe_data){
   dfs <- list()
   for(i in seq(2004, 2022, 2)){
     year <- toString(i)
