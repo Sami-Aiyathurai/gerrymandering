@@ -1,17 +1,24 @@
 ## Summary statistics
-
 library(rio)
 library(foreign)
+library(ggplot2)
 library(tidyverse)
+library(broom)
 library(bayesplot)
 library(rstanarm)
 library(MCMCpack)
+library(dplyr)
 library(parameters)
-library(loo)
 library(bayestestR)
+library(loo)
 library(coda)
+library(sjPlot)
+library(augment)
+library(sjmisc)
+library(sjlabelled)
+library(tidyverse)
 
-egs_mod <- import("egs_mod.csv")
+egs_mod <- import("egs_mod2.csv")
 
 summary(egs_mod)
 
@@ -120,3 +127,58 @@ mcmc_hist(ri3) # these don't look great
 mcmc_trace(ri3)
 mcmc_dens_overlay(ri3)
 plot(ranef(ri3))
+
+plot(ranef(vpc5))
+
+
+model_parameters(vpc5, centrality="median", ci=0.95, ci_method="hdi", digits=3)
+model_parameters(ri3, centrality="median", ci=0.95, ci_method="hdi", digits=3)
+model_parameters(ri1, centrality="median", ci=0.95, ci_method="hdi", digits=3)
+
+## don't forget waic(vpc5) and how to interpret it
+
+## Interpreting the VPC
+print(vpc5, digits=3)
+summary(vpc5, digits=3)
+dotplot(ranef(vpc5))
+
+## 7.164% of the variance is explained by state level differences, 4.207% by individuals
+## VPC = 7.164/(7.164+4.207) = 63.00%
+# this means that 63% of the variance appears to be associated with differences between states
+
+# - print(vpc7)
+# - country std dev 1.765
+# - 1.765% of the variance is explained by country level differences, 2.606% is explained by individual level differences.
+# - residual: 2.606
+# - VPC = 1.765/(1.765+2.606) = 0.4038
+# - 40.38% of variance appears to be associated with differences between countries.
+# - amount of variation in the outcome that exists between individuals
+# - country intercept as proportion of country + residual (STD add)
+
+## Interpreting RI
+print(ri1, digits=3)
+
+summary(ri3, digits=3)
+
+ranefri1 <- as.data.frame(ranef(ri1))
+
+ggplot(ranefri1, aes(x=condval, y=grp)) +
+  geom_point()
+
+
+## 6.435/(4.305+6.435) = 59.9162% of the variation is associated with differences between countries
+
+# - remember: random intercept implies that each country has the same relationship between the two variables, they just have different starting points
+# - VPC 1.733 / (1.733+2.603) = 39.97% variation is associated with differences between countries
+# - 1.733 is the variation explained by country level
+# - 2.603 is the variation explained by individual level
+# rn.b.ri2 <- ranef(b.ri2)
+# df.rn.b.ri2 <- as.data.frame(rn.b.ri2)
+#
+# ggplot(euro.short, aes(x=fairelcc, y=accalaw)) +
+#   geom_jitter() +
+#   geom_path(x=0, y=-1.656, color="red")
+#
+# ggplot(df.rn.b.ri2, aes(y=condval, color=grp)) +
+#   geom_line()
+
