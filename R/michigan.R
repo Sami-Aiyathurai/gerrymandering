@@ -184,6 +184,9 @@ year_baseline_data_mi <- function(year, data) {
   full_sa_di <- sa_contest_all_mi(data)
 
   main_year <- full_sa_di[[myear]]
+  if (ncol(main_year) > 14) {
+    main_year <- subset(main_year, select = -c(election_day,absentee))
+  }
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
 
@@ -192,6 +195,9 @@ year_baseline_data_mi <- function(year, data) {
   main_minus_four <- access_state_year(myearm4, data)
 
   statewide_main_year <- statewide_master_mi(main_year_state)
+  if (ncol(statewide_main_year) > 13) {
+    statewide_main_year <- subset(statewide_main_year, select = -c(election_day,absentee) )
+  }
   statewide_main_minus_two <- statewide_master_mi(main_minus_two)
   statewide_main_minus_four <- statewide_master_mi(main_minus_four)
 
