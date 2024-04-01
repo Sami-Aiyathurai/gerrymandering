@@ -33,6 +33,7 @@ michigan <- function(year,...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
   votes_year <- year_baseline_data_mi(year_num, mi_data)
+  print(votes_year)
   eg_year <- efficiency_gap_mi(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested_mi(votes_year, year_num)
 
@@ -43,7 +44,7 @@ michigan <- function(year,...) {
   return(mi_year)
 }
 
-## michigan(2022) still doesn't work
+michigan(2022) #still doesn't work
 
 ## CO
 
