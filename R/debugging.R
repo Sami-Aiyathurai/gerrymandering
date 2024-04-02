@@ -1,11 +1,18 @@
 ## experimenting with 2022
 
-mi_2022 <- mi_data[[12]]
+mi_2022 <- mi_data[[10]]
+mi_2020 <- mi_data[[9]] # str of detroit city 441
+mi_2016 <- mi_data[[7]]
+mi_2018 <- mi_data[[8]]
+mi_2014 <- mi_data[[6]]
+mi_2012 <- mi_data[[5]] # detroit city 441 ward 5
+mi_2010 <- mi_data[[4]] # not in
+mi_2008 <- mi_data[[3]] # not in
 
 mihd1 <- mi_2022 %>%
   filter(district == 1) %>%
   filter(office == "State House")
-
+## mihd 1, 2, 3, 4 totally empty -- manually input from the secretary of state WEBSITE (all county vals)
 
 mihd35 <- mi_2022 %>%
   filter(district ==35) %>%
@@ -19,11 +26,12 @@ mihd36 <- mi_2022 %>%
 ## parties are dem and rep if empty string then discard
 
 mi_2022_prep <- function(year_data) {
-
+  yd <- year_data[!year_data$party=="", ]
+  return(yd)
 }
 
-
-
+mi_2022 <- mi_data[[10]]
+mm <- mi_2022_prep(mi_2022)
 
 ## WI district 58 2012 is the issue
 
