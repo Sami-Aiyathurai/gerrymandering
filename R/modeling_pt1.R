@@ -49,7 +49,7 @@ print(m1, digits=3)
 # - no independent variables, estimate the extnt to which clustering occurs within a group
 # - estimate the intercept value, interclass correlation (the proportion of the DV attributed to clustering)
 
-vpc1 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349)
+vpc1 <- stan_glmer(formula=EG~1+(1|State), family=gaussian, data=egs, seed=349)
 
 print(vpc1, digits=3)
 summary(vpc1, digits=3)
