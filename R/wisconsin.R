@@ -17,7 +17,12 @@ open_elections_factory <- function(state) {
     for (district in data) {
       data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
       data$contest_rep <- ifelse(data$party == "REP", 1, 0)
-      data$year <- as.numeric(year)
+      data$year <- as.numeric(year) # write function here that will change all
+      # instances of Ward, Wds, Wd to precint, amke it all lower case, no white space etc.
+      # change var name of ward to precinct
+      # change state assembly <- state house
+      # careful with testing for strings it can be weird
+      # delete all excess files!!
     }
     data
   }

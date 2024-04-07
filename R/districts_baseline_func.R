@@ -11,6 +11,11 @@ baseline_function <- function(x) {
   base_x2 <- subsetting(base_x)
   return(base_x2)
 }
+
+## build into baseline_function an ifelse statement, if there are
+# multiple districts do X if not do it as written
+# but as two separate functions
+
 #' @param x takes the primary data frame as modified in baseline_function
 subsetting <- function(x, ...) {
   tail <- tail(x, n=1)
