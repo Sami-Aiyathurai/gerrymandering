@@ -1,5 +1,18 @@
 ## egs pos & modeling
 
+library(stargazer)
+library(knitr)
+
+
+yb2014 <- year_baseline_data(2014, wi_data)
+yb2016 <- year_baseline_data(2016, wi_data)
+
+## scott wanted to see contested vs uncontested EGs
+## maybe even contested vs uncontested estimations vs 75/25 split
+## one guy said something about showing competition
+
+kable(yb2014)
+
 library(rio)
 egs <- import("egs_mod2.csv")
 
@@ -38,10 +51,10 @@ ggplot(egs, aes(x=EG_cat)) +
   xlab("Centered absolute value efficiency gaps") +
   ggtitle("Distribution of acceptable and gerrymandered plans across all states and years")
 
-egs$EG_shift <- sort(egs$EG)
-egs$EG_cat1[egs$EG_shift <= -0.08] <- "Republican gerrymander"
-egs$EG_cat1[egs$EG_shift > -0.08 & egs$EG_shift < 0.08] <- "Acceptable"
-egs$EG_cat1[egs$EG_shift >= 0.08] <- "Democratic gerrymander"
+
+egs$EG_cat1[egs$EG <= -0.08] <- "Republican gerrymander"
+egs$EG_cat1[egs$EG > -0.08 & egs$EG < 0.08] <- "Acceptable"
+egs$EG_cat1[egs$EG >= 0.08] <- "Democratic gerrymander"
 
 egs$EG_cat1 <- factor(egs$EG_cat1, levels=c("Republican gerrymander", "Acceptable", "Democratic gerrymander"))
 
@@ -49,7 +62,23 @@ ggplot(egs, aes(x=EG_cat1)) +
   geom_bar() +
   xlab("Efficiency gap categories") +
   ylab("Count") +
-  ggtitle("Distribution of efficiency gaps by status")
+  ggtitle("Distribution of efficiency gaps")
+
+ggplot(egs, aes(x=State, fill=EG_cat1)) +
+  geom_bar(position="dodge") +
+  xlab("Efficiency gap categories") +
+  ylab("Count") +
+  ggtitle("Distribution of efficiency gaps")
+
+ggplot(egs, aes(x=Year, y=EG)) +
+  geom_point(aes(color=State)) +
+  facet_wrap(~EG_cat1) +
+  scale_y_continuous(breaks=seq(-0.20, 0.12, 0.04),
+                     label=c("-0.20", "-0.16",
+                             "-0.12", "-0.08", "-0.04",
+                             "0", "0.04", "0.08", "0.12")) +
+  theme_light()
+#  scale_y_continuous(breaks=seq(-0.24, 0.12, 0.4))
 
 # should shift this so 0 is the minimum
 
@@ -58,7 +87,21 @@ egs$State <- as.factor(egs$State)
 ggplot(egs, aes(x=State, y=EG)) +
   geom_boxplot() +
   scale_y_continuous(breaks=seq(-0.24, 0.12, 0.04)) +
-  ggtitle("Boxplots of efficiency gaps by state")
+  ggtitle("Boxplots of efficiency gaps by state for 2008-2022") +
+  ylab("Efficiency gap") +
+  geom_hline(yintercept=0.08, linetype="dashed") +
+  geom_hline(yintercept=-0.08, linetype="dashed")
+
+ggplot(egs, aes(x=Year, y=EG)) +
+  geom_point(aes(color=State)) +
+  scale_y_continuous(breaks=seq(-0.24, 0.12, 0.04)) +
+  ylab("Efficiency gap") +
+  geom_hline(yintercept=0.08, linetype="dashed") +
+  geom_hline(yintercept=-0.08, linetype="dashed") +
+  ggtitle("State house efficiency gaps from 2008-2022") +
+  scale_x_continuous(breaks=seq(2008, 2022, 2)) +
+  theme_light()
+
 
 ## showing contested and uncontested districts per state
 
@@ -131,3 +174,5 @@ vp1 <- stan_glmer(formula=EG_pos~1+(1|State), family=gaussian, data=egs, seed=34
 
 print(vp1, digits=3) # has one divergence
 print(vpc1, digits=3)
+
+
