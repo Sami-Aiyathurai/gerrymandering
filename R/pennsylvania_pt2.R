@@ -70,9 +70,9 @@ year_baseline_data_pa <- function(year, data) {
   main_minus_two <- access_state_year(myearm2, data)
   main_minus_four <- access_state_year(myearm4, data)
 
-  statewide_main_year <- statewide_master_mi(main_year_state)
-  statewide_main_minus_two <- statewide_master_mi(main_minus_two)
-  statewide_main_minus_four <- statewide_master_mi(main_minus_four)
+  statewide_main_year <- statewide_master(main_year_state)
+  statewide_main_minus_two <- statewide_master(main_minus_two)
+  statewide_main_minus_four <- statewide_master(main_minus_four)
 
   contested_main_year <- main_year %>%
     dplyr::filter(.data[["contested"]] == "contested")
@@ -97,9 +97,9 @@ year_baseline_data_pa <- function(year, data) {
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
     dis_name <- as.character(i)
-    main_year <- district_func_pa(temp, statewide_main_year) # district func mi
-    mainyearminus2 <- district_func_pa(temp, statewide_main_minus_two) # district_func_mi
-    mainyearminus4 <- district_func_pa(temp, statewide_main_minus_four) # district_func_mi
+    main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
+    mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
+    mainyearminus4 <- district_func_precincts(temp, statewide_main_minus_four) # district_func_mi
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
     districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
     districts_full[i, ] <- districts[[dis_name]][["estimates"]]

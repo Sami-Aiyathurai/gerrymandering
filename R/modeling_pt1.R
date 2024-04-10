@@ -26,7 +26,7 @@ egs_mod$State <- as.factor(egs_mod$State)
 egs_mod$Trifecta <- as.factor(egs_mod$Trifecta)
 egs_mod$Institution <- as.factor(egs_mod$Institution)
 egs_mod$State_Supreme_method <- as.factor(egs_mod$State_Supreme_method)
-
+egs_mod$primary <- as.factor(egs_mod$primary)
 
 ggplot(egs_mod, aes(x=Efficiency_gap)) +
   geom_histogram()
@@ -79,7 +79,7 @@ mcmc_trace(vpc3)
 mcmc_dens_overlay(vpc3)
 
 vpc4 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349,
-                   iter=20000, warmup=5000, thin=5, chains=5)
+                   iter=15000, warmup=2500, thin=5, chains=4) # modified VPC4 to have no more than 15000, smaller WU, 4 chains
 print(vpc4, digits=3)
 summary(vpc4,digits=3)
 mcmc_acf(vpc4, pars=c("sigma", "(Intercept)"))
@@ -88,7 +88,7 @@ mcmc_trace(vpc4)
 mcmc_dens_overlay(vpc4) # fits a lot better
 
 vpc5 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349,
-                   iter=25000, warmup=5000, thin=5, chains=5)
+                   iter=20000, warmup=2500, thin=5, chains=4)
 print(vpc5, digits=3)
 summary(vpc5,digits=3)
 mcmc_acf(vpc5, pars=c("sigma", "(Intercept)"))
@@ -97,8 +97,8 @@ mcmc_trace(vpc5)
 mcmc_dens_overlay(vpc5) # these are all pretty good
 
 ri1 <- stan_glmer(formula=Efficiency_gap~Trifecta+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=25000, warmup=5000, thin=5, chains=5)
-# 2 divergent transitions after warmup
+                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
+# no more divergences! yay! these are the settings I should use then
 print(ri1, digits=3)
 summary(ri1,digits=3)
 mcmc_acf(ri1, pars=c("sigma", "(Intercept)"))
@@ -108,18 +108,19 @@ mcmc_dens_overlay(ri1)
 plot(ranef(ri1))
 
 ri2 <- stan_glmer(formula=Efficiency_gap~Institution+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=25000, warmup=5000, thin=5, chains=5)
+                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
+## no divergences
 print(ri2, digits=3)
 summary(ri2,digits=3)
 mcmc_acf(ri2, pars=c("sigma", "(Intercept)"))
-mcmc_hist(ri2) # these don't look great
+mcmc_hist(ri2)
 mcmc_trace(ri2)
 mcmc_dens_overlay(ri2) # these look good
 
 
 ri3 <- stan_glmer(formula=Efficiency_gap~State_Supreme_method+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=30000, warmup=5000, thin=5, chains=5)
-## 36 divergent transitions
+                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
+## lol 118 divergences
 print(ri3, digits=3)
 summary(ri3,digits=3)
 mcmc_acf(ri3, pars=c("sigma", "(Intercept)"))
@@ -130,6 +131,15 @@ plot(ranef(ri3))
 
 plot(ranef(vpc5))
 
+ri4 <- stan_glmer(formula=Efficiency_gap~primary+(1|State), family=gaussian, data=egs_mod,
+                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
+## 73 divergences
+print(ri4, digits=3)
+summary(ri4,digits=3)
+mcmc_acf(ri4, pars=c("sigma", "(Intercept)"))
+mcmc_hist(ri4) # these don't look great
+mcmc_trace(ri4)
+mcmc_dens_overlay(ri4)
 
 model_parameters(vpc5, centrality="median", ci=0.95, ci_method="hdi", digits=3)
 model_parameters(ri3, centrality="median", ci=0.95, ci_method="hdi", digits=3)

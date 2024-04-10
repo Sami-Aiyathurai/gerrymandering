@@ -24,7 +24,7 @@ egs <- egs %>%
          Trifecta, State_Supreme_method) %>%
   distinct()
 
-egs$primary <- as.character(1:29)
+egs$primary <- as.character(1:30)
 
 egs$primary[egs$State == "CO"] <- "Open to Unaffiliated"
 egs$primary[egs$State == "PA"] <- "Closed"

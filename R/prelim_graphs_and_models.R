@@ -6,6 +6,15 @@ states <- import("StatesAndCyclesData_production-20240301a.csv")
 egs$Year <- as.numeric(egs$Year)
 egs$Year <- as.integer(egs$Year)
 
+egs$EG_pos <- abs(egs$Efficiency_gap)
+egs$EG <- egs$Efficiency_gap
+
+egs$primary <- as.character(1:30)
+
+egs$primary[egs$State == "CO"] <- "Open to Unaffiliated"
+egs$primary[egs$State == "PA"] <- "Closed"
+egs$primary[egs$State == "WI"] <- "Open"
+egs$primary[egs$State == "MI"] <- "Open"
 
 mod_state <- states %>%
   dplyr::select(State, `Cycle Year`, Level, Seats, Institution, `Party Control`, Governor) %>% #`Plan Status`) %>%
