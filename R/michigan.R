@@ -19,13 +19,15 @@ open_elections_factory_mi <- function(state) {
     url <- file.path(temp1 , year, temp3)
     data <- utils::read.csv(url)
     for (district in data) {
-      data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
-      data$contest_rep <- ifelse(data$party == "REP", 1, 0)
+      data <- mi_prep(data)
       data$year <- as.numeric(year)
+
 
       if (year == 2022) {
         data$votes <- as.numeric(data$votes)
         data$votes <- as.integer(data$votes)
+        data$absentee <- as.numeric(data$absentee)
+        data$absentee <- as.integer(data$absentee)
       }
     }
     data
@@ -46,53 +48,76 @@ access_state_year <- function(year, data){
   return(state_year)
 }
 
+mi_prep <- function(data) {
+  data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
+  data$contest_rep <- ifelse(data$party == "REP", 1, 0)
+  data <- data %>%
+    filter(office == "U.S. Senate" | office == "President" | office == "State House" |
+             office == "Attorney General" | office == "Secretary of State" |
+             office == "Governor")
+  data$precinct <- str_to_lower(data$precinct)
+  data$county <- str_to_lower(data$county)
+  data$county <- str_squish(data$county)
+  data$precinct <- str_replace_all(data$precinct, "[^[:alnum:]]", " ")
+  data$precinct <- str_squish(data$precinct)
+  data$cw_concat <- paste(data$county, data$precinct, sep=" ")
+  data$cw_concat <- stri_replace_all_regex(data$cw_concat,
+                                           pattern=c("avcb", "district"), # just replace it see what happens
+                                           replacement="precinct",
+                                           vectorize=FALSE)
+  data$cw_concat <- str_replace_all(data$cw_concat, "[^[:alnum:]]", " ")
+  data$cw_concat <- str_squish(data$cw_concat)
+  return(data)
+}
+
 mi_data <- open_elections_factory_mi("mi")
 mi_data <- generate_data(mi_data)
+contested_mi <- sa_contest_all(mi_data)
 
-## uncontested step 1 functions modified
+## UNCONTESTED DOES NOT NEED TO BE MODIFIED ANYMORE
 
-contest_di_mi <- function(year_data){
-  sa_data <- year_data %>%
-    dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
-    dplyr::filter(.data[["office"]] == "State House") # mod state assembly -> state house
-  di_data_sa <- sa_data %>%
-    dplyr::group_by(district)  %>%
-    dplyr::summarize(contest_d = sum(.data[["contest_dem"]]), contest_r = sum(.data[["contest_rep"]]))
-  for (district in di_data_sa) {
-    di_data_sa$contested <- ifelse((di_data_sa$contest_d == 0) | (di_data_sa$contest_r == 0), "uncontested", "contested")
-  }
-  full_sa_di <- sa_data %>%
-    dplyr::left_join(di_data_sa, by=c('district'))
-  return(full_sa_di)
-}
-
-sa_contest_all_mi <- function(data){
-  sa_contest_dfs<- list()
-  for(i in seq(2000, 2022, 2)){
-    year <- toString(i)
-    year_data <- access_state_year(year, data)
-    sa_contest_dfs[[year]] <- contest_di_mi(year_data)
-  }
-  return(sa_contest_dfs)
-}
+# contest_di_mi <- function(year_data){
+#   sa_data <- year_data %>%
+#     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
+#     dplyr::filter(.data[["office"]] == "State House") # mod state assembly -> state house
+#   di_data_sa <- sa_data %>%
+#     dplyr::group_by(district)  %>%
+#     dplyr::summarize(contest_d = sum(.data[["contest_dem"]]), contest_r = sum(.data[["contest_rep"]]))
+#   for (district in di_data_sa) {
+#     di_data_sa$contested <- ifelse((di_data_sa$contest_d == 0) | (di_data_sa$contest_r == 0), "uncontested", "contested")
+#   }
+#   full_sa_di <- sa_data %>%
+#     dplyr::left_join(di_data_sa, by=c('district'))
+#   return(full_sa_di)
+# }
+#
+# sa_contest_all_mi <- function(data){
+#   sa_contest_dfs<- list()
+#   for(i in seq(2000, 2022, 2)){
+#     year <- toString(i)
+#     year_data <- access_state_year(year, data)
+#     sa_contest_dfs[[year]] <- contest_di_mi(year_data)
+#   }
+#   return(sa_contest_dfs)
+# }
 
 ## Data cleaning uncontested
 
-statewide_master_mi <- function(x) { # create new func: statewide_master_mi
-  x <- filter_statewide_mi(x) # call filter_statewide_mi
-  y <- total_vote_func(x)
-  z <- total_2p_vote_func(x)
-  x <- vote_join(x, y, z)
-  return(x)
-}
-
-filter_statewide_mi <- function(x) {
-  x <- x %>%
-    filter(.data[["office"]] == "U.S. Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" | # changed to include U.S. Senate
-             .data[["office"]] == "Secretary of State" | .data[["office"]] == "Governor")
-  #x <- x[-c(1, 5:6)]
-  return(x)
-}
+# statewide_master_mi <- function(x) { # create new func: statewide_master_mi
+#   x <- filter_statewide_mi(x) # call filter_statewide_mi
+#   y <- total_vote_func(x)
+#   z <- total_2p_vote_func(x)
+#   x <- vote_join(x, y, z)
+#   return(x)
+# }
+#
+# filter_statewide_mi <- function(x) {
+#   x <- x %>%
+#     filter(.data[["office"]] == "U.S. Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" | # changed to include U.S. Senate
+#              .data[["office"]] == "Secretary of State" | .data[["office"]] == "Governor")
+#   #x <- x[-c(1, 5:6)]
+#   return(x)
+# }
 
 total_vote_func <- function(x) {
   x <- x %>%
@@ -126,7 +151,8 @@ check_districts <- function(x) {
 # x = sa_contest (product of sa_contest_all function on my_data)
 # y = statewide_master_mi (year requested statewide race info)
 
-district_func_mi <- function(x, y) {
+## CHANGED TO DISTRICT_FUNC_PRECINCTS
+district_func_precincts <- function(x, y) {
   tv_sax_year <- total_vote_func(x)
   tv2p_sax_year <- total_2p_vote_func(x)
   sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
@@ -134,13 +160,12 @@ district_func_mi <- function(x, y) {
   wards_sax_year <- data.frame(precinct = check_precincts(x)) # did not change these variable names
   statewide_x_year <- y %>%
     dplyr::right_join(wards_sax_year, by = "precinct") # changed to precinct
-  statewide_x_year <- statewide_x_year[-(11:12)] # changed the indices
+  statewide_x_year <- statewide_x_year %>%
+    dplyr::select(-c(total_votes, total_votes_2p))
   tv_statewide_x_year <- total_vote_func(statewide_x_year)
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
-  print(names(statewide_x_year))
-  print(names(sax_year))
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
 }
@@ -224,9 +249,9 @@ year_baseline_data_mi <- function(year, data) {
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
     dis_name <- as.character(i)
-    main_year <- district_func_mi(temp, statewide_main_year) # district func mi
-    mainyearminus2 <- district_func_mi(temp, statewide_main_minus_two) # district_func_mi
-    mainyearminus4 <- district_func_mi(temp, statewide_main_minus_four) # district_func_mi
+    main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
+    mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
+    mainyearminus4 <- district_func_precincts(temp, statewide_main_minus_four) # district_func_mi
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
     districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
     districts_full[i, ] <- districts[[dis_name]][["estimates"]]
