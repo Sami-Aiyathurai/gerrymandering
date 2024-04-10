@@ -1,6 +1,35 @@
 ## WISCONSIN
 
-open_elections_factory <- function(state) {
+library(tidyverse)
+library(stringr)
+library(stringi)
+library(forstringr)
+library(redist)
+library(geomander)
+library(alarmdata)
+
+## WISCONSIN
+
+wi_prep <- function(data) {
+  data$office[data$office == "Senate"] <- "U.S. Senate"
+  data$office[data$office == "State Assembly"] <- "State House"
+  data <- data %>%
+    filter(office == "U.S. Senate" | office == "President" | office == "State House" |
+             office == "Attorney General" | office == "Secretary of State" |
+             office == "Governor")
+  data$ward <- str_to_lower(data$ward)
+  data$county <- str_to_lower(data$county)
+  data$cw_concat <- paste(data$county, data$ward, sep=" ")
+  data$cw_concat <- stri_replace_all_regex(data$cw_concat,
+                                           pattern=c("ward", "wds", "wd", "wards"),
+                                           replacement="precinct",
+                                           vectorize=FALSE)
+  data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
+  data$contest_rep <- ifelse(data$party == "REP", 1, 0)
+  return(data)
+}
+
+open_elections_factory_wi <- function(state) {
   dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
   temp1 <-paste("https://raw.githubusercontent.com/openelections/openelections-data-",state,"/master", sep = "")
   if (state == "wi"){
@@ -15,14 +44,9 @@ open_elections_factory <- function(state) {
     url <- file.path(temp1 , year, temp3)
     data <- utils::read.csv(url)
     for (district in data) {
-      data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
-      data$contest_rep <- ifelse(data$party == "REP", 1, 0)
-      data$year <- as.numeric(year) # write function here that will change all
-      # instances of Ward, Wds, Wd to precint, amke it all lower case, no white space etc.
-      # change var name of ward to precinct
-      # change state assembly <- state house
-      # careful with testing for strings it can be weird
-      # delete all excess files!!
+      data <- wi_prep(data)
+      data$year <- as.numeric(year)
+
     }
     data
   }
@@ -46,7 +70,7 @@ access_state_year <- function(year, data){
 contest_di <- function(year_data){
   sa_data <- year_data %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
-    dplyr::filter(.data[["office"]] == "State Assembly")
+    dplyr::filter(.data[["office"]] == "State House")
   di_data_sa <- sa_data %>%
     dplyr::group_by(district)  %>%
     dplyr::summarize(contest_d = sum(.data[["contest_dem"]]), contest_r = sum(.data[["contest_rep"]]))
@@ -88,9 +112,8 @@ statewide_master <- function(x) {
 #' @param x data frame created by open_elections_factory and generate_data
 filter_statewide <- function(x) {
   x <- x %>%
-    filter(.data[["office"]] == "Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" |
+    filter(.data[["office"]] == "U.S. Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" |
              .data[["office"]] == "Secretary of State" | .data[["office"]] == "Governor")
-  #x <- x[-c(1, 5:6)]
   return(x)
 }
 
@@ -130,6 +153,7 @@ check_districts <- function(x) {
 
 #' @param x data frame of state assembly by district, as established by for loops
 #' @param y data frame of statewide data for the given year
+#' MODIFied to negative select
 district_func <- function(x, y) {
   tv_sax_year <- total_vote_func(x)
   tv2p_sax_year <- total_2p_vote_func(x)
@@ -138,7 +162,8 @@ district_func <- function(x, y) {
   wards_sax_year <- data.frame(ward = check_wards(x))
   statewide_x_year <- y %>%
     dplyr::right_join(wards_sax_year, by = "ward")
-  statewide_x_year <- statewide_x_year[-(12:13)] # this index chops off the total_votes and total_votes_2p columns!!
+  statewide_x_year <- statewide_x_year %>%
+    dplyr::select(-c(total_votes, total_votes_2p))# this index chops off the total_votes and total_votes_2p columns!!
   tv_statewide_x_year <- total_vote_func(statewide_x_year)
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%

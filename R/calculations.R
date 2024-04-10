@@ -12,7 +12,7 @@ wi_data <- generate_data(wi_data)
 wisconsin <- function(year, ...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
-  votes_year <- year_baseline_data(year_num, wi_data)
+  votes_year <- MZyear_baseline_data(year_num, wi_data)
   eg_year <- efficiency_gap(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested(votes_year, year_num)
   wi_year <- data.frame(Year = year,
@@ -84,7 +84,7 @@ pennsylvania <- function(year, ...) {
   return(pa_year)
 }
 
-wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2014),
+wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2012), wisconsin(2014),
                 wisconsin(2016), wisconsin(2018), wisconsin(2020), wisconsin(2022))
 
 co_egs <- rbind(colorado(2008), colorado(2010), colorado(2014), colorado(2016),
