@@ -106,25 +106,6 @@ co_2010 <- access_state_year("2010", co_data)
 co_2008 <- access_state_year("2008", co_data)
 statewide_co_2008 <- statewide_master_mi(co_2008)
 
-district_func_co <- function(x, y) {
-  tv_sax_year <- total_vote_func(x)
-  tv2p_sax_year <- total_2p_vote_func(x)
-  sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
-    dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
-    dplyr::filter(.data[["office"]] == "State House")
-  wards_sax_year <- data.frame(precinct = check_precincts(x))
-  statewide_x_year <- y %>%
-    dplyr::right_join(wards_sax_year, by = "precinct") # changed to precinct
-  statewide_x_year <- statewide_x_year[-(11:12)] # changed the indices
-  tv_statewide_x_year <- total_vote_func(statewide_x_year)
-  tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
-  statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
-    dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") #%>%
-  district_x_year <- rbind(statewide_x_year, sax_year)
-  district_x_year <- candidate_function(district_x_year)
-  return(district_x_year)
-
-}
 
 year_baseline_data_co <- function(year, data) {
   districts_full <- data.frame(District = 1:65, # changed from 1:99 to 1:65 for all of these
@@ -145,9 +126,9 @@ year_baseline_data_co <- function(year, data) {
   main_minus_two <- access_state_year(myearm2, data)
   main_minus_four <- access_state_year(myearm4, data)
 
-  statewide_main_year <- statewide_master_mi(main_year_state)
-  statewide_main_minus_two <- statewide_master_mi(main_minus_two)
-  statewide_main_minus_four <- statewide_master_mi(main_minus_four)
+  statewide_main_year <- statewide_master(main_year_state)
+  statewide_main_minus_two <- statewide_master(main_minus_two)
+  statewide_main_minus_four <- statewide_master(main_minus_four)
 
   contested_main_year <- main_year %>%
     dplyr::filter(.data[["contested"]] == "contested")
@@ -172,9 +153,9 @@ year_baseline_data_co <- function(year, data) {
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
     dis_name <- as.character(i)
-    main_year <- district_func_co(temp, statewide_main_year) # district func mi
-    mainyearminus2 <- district_func_co(temp, statewide_main_minus_two) # district_func_mi
-    mainyearminus4 <- district_func_co(temp, statewide_main_minus_four) # district_func_mi
+    main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
+    mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
+    mainyearminus4 <- district_func_precincts(temp, statewide_main_minus_four) # district_func_mi
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
     districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
     districts_full[i, ] <- districts[[dis_name]][["estimates"]]
