@@ -170,8 +170,6 @@ district_func_precincts <- function(x, y) {
   district_x_year <- candidate_function(district_x_year)
 }
 
-district_func_mi(contested_mi, statewide_mi_2012)
-
 check_precincts <- function(x) { # remade this function to be precincts not wards, put into district_func
   uprecinct <- (unique(x$precinct))
   return(uprecinct)
@@ -206,12 +204,12 @@ year_baseline_data_mi <- function(year, data) {
   myearm2 <- as.character((year-2))
   myearm4 <- as.character((year-4))
 
-  full_sa_di <- sa_contest_all_mi(data)
+  full_sa_di <- sa_contest_all(data)
 
   main_year <- full_sa_di[[myear]]
-  if (ncol(main_year) > 14) {
-    main_year <- subset(main_year, select = -c(election_day,absentee))
-  }
+  # if (ncol(main_year) > 14) {
+  #   main_year <- subset(main_year, select = -c(election_day,absentee))
+  # }
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
 
@@ -219,12 +217,12 @@ year_baseline_data_mi <- function(year, data) {
   main_minus_two <- access_state_year(myearm2, data)
   main_minus_four <- access_state_year(myearm4, data)
 
-  statewide_main_year <- statewide_master_mi(main_year_state)
-  if (ncol(statewide_main_year) > 13) {
-    statewide_main_year <- subset(statewide_main_year, select = -c(election_day,absentee) )
-  }
-  statewide_main_minus_two <- statewide_master_mi(main_minus_two)
-  statewide_main_minus_four <- statewide_master_mi(main_minus_four)
+  statewide_main_year <- statewide_master(main_year_state)
+  # if (ncol(statewide_main_year) > 13) {
+  #   statewide_main_year <- subset(statewide_main_year, select = -c(election_day,absentee) )
+  # }
+  statewide_main_minus_two <- statewide_master(main_minus_two)
+  statewide_main_minus_four <- statewide_master(main_minus_four)
 
   contested_main_year <- main_year %>%
     dplyr::filter(.data[["contested"]] == "contested")

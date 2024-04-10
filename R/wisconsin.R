@@ -92,7 +92,7 @@ sa_contest_all<- function(data){
   return(sa_contest_dfs)
 }
 
-wi_data <- open_elections_factory("wi")
+wi_data <- open_elections_factory_wi("wi")
 wi_data <- generate_data(wi_data)
 contested_wi <- sa_contest_all(wi_data)
 
