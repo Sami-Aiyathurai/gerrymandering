@@ -1,3 +1,5 @@
+## CO pt 2
+
 ## Colorado!!
 
 variable_prep <- function(data) {
@@ -12,12 +14,19 @@ variable_prep <- function(data) {
   data$office[data$office == "State Assembly"] <- "State House"
   data$office[data$office == "Senate"] <- "U.S. Senate"
   data$office[data$office == "US Senate"] <- "U.S. Senate"
+  data$precinct <- str_to_lower(data$precinct)
+  data$county <- str_to_lower(data$county)
+  data$county <- str_squish(data$county)
+  data$precinct <- str_squish(data$precinct)
   data$precinct <- as.character(data$precinct)
   data$votes <- as.integer(data$votes)
+  data$cw_concat <- paste(data$county, data$precinct, sep=" ")
   data$district <- as.numeric(data$district)
   data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
   data <- data %>%
-    select(county, precinct, office, district, party, candidate, votes)
+    select(county, precinct, office, district, party, candidate, votes, cw_concat) %>%
+    filter(office == "State House" | office == "President" | office == "U.S. Senate" |
+             office == "Governor" | office == "Secretary of State" | office == "Attorney General")
   return(data)
 }
 
@@ -71,27 +80,12 @@ co_data <- generate_data_co(co_data)
 
 # uncontested mods
 
-contest_di_co <- function(year_data){
-  sa_data <- year_data %>%
-    dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP") %>%
-    dplyr::filter(.data[["office"]] == "State House")
-  di_data_sa <- sa_data %>%
-    dplyr::group_by(district)  %>%
-    dplyr::summarize(contest_d = sum(.data[["contest_dem"]]), contest_r = sum(.data[["contest_rep"]]))
-  for (district in di_data_sa) {
-    di_data_sa$contested <- ifelse((di_data_sa$contest_d == 0) | (di_data_sa$contest_r == 0), "uncontested", "contested")
-  }
-  full_sa_di <- sa_data %>%
-    dplyr::left_join(di_data_sa, by=c('district'))
-  return(full_sa_di)
-}
-
 sa_contest_all_co <- function(data){ #mod function name
   sa_contest_dfs<- list()
   for(i in seq(2004, 2022, 2)){ #mod range to 2004
     year <- toString(i)
     year_data <- access_state_year(year, data)
-    sa_contest_dfs[[year]] <- contest_di_co(year_data)
+    sa_contest_dfs[[year]] <- contest_di(year_data)
   }
   return(sa_contest_dfs)
 }
@@ -105,6 +99,8 @@ contested_co <- sa_contest_all_co(co_data)
 co_2010 <- access_state_year("2010", co_data)
 co_2008 <- access_state_year("2008", co_data)
 statewide_co_2008 <- statewide_master_mi(co_2008)
+
+## use the same district_func_precincts
 
 
 year_baseline_data_co <- function(year, data) {
@@ -163,58 +159,25 @@ year_baseline_data_co <- function(year, data) {
   return(districts_full)
 }
 
-efficiency_gap_co <- function(full_votes, year) { #changed the default table
-  mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
-                      Total_seats = c(65, 65, 65, 65, 65, 65, 65, 65),
-                      Dem_seats = c(37, 32, 37, 34, 37, 41, 41, 46),
-                      Rep_seats = c(28, 33, 28, 31, 28, 24, 24, 19)
-  )
-  myear <- as.character(year)
-  wi_sa_year <- mi_sa %>%
-    dplyr::filter(.data[["Year"]] == myear)
-  Stotal <- wi_sa_year$Total_seats[1]
-  Sdem <- wi_sa_year$Dem_seats[1]
-  Srep <- wi_sa_year$Rep_seats[1]
-  amended <- vote_prep(full_votes) %>%
-    dplyr::mutate(CO = "CO") %>% #changed from wi to mi
-    dplyr::group_by(.data[["CO"]]) %>%
-    dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
-                     total_rep = sum(.data[["Rep_votes"]]),
-                     total_total = sum(.data[["total_votes"]]))
-  Vrep <- amended$total_rep
-  Vdem <- amended$total_dem
-  Vtotal <- amended$total_total
-  Vmargin <- ((Vrep - Vdem) / Vtotal)
-  Smargin <- 0.5 * ((Srep - Sdem) / Stotal)
-  EG <- as.numeric(Vmargin - Smargin)
-  return(EG)
-}
+ybdco12 <- year_baseline_data_co(2012, co_data)
 
-efficiency_gap_contested_co <- function(full_votes, year) {
-  mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
-                      Total_seats = c(65, 65, 65, 65, 65, 65, 65, 65),
-                      Dem_seats = c(37, 32, 37, 34, 37, 41, 41, 46),
-                      Rep_seats = c(28, 33, 28, 31, 28, 24, 24, 19)
-  )
-  myear <- as.character(year)
-  wi_sa_year <- mi_sa %>%
-    dplyr::filter(.data[["Year"]] == myear)
-  Stotal <- wi_sa_year$Total_seats[1]
-  Sdem <- wi_sa_year$Dem_seats[1]
-  Srep <- wi_sa_year$Rep_seats[1]
-  full_votes_cont <- full_votes %>%
-    dplyr::filter(.data[["Contested"]] == "contested")
-  amended <- vote_prep(full_votes_cont) %>%
-    dplyr::mutate(CO = "CO") %>%
-    dplyr::group_by(.data[["CO"]]) %>%
-    dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
-                     total_rep = sum(.data[["Rep_votes"]]),
-                     total_total = sum(.data[["total_votes"]]))
-  Vrep <- amended$total_rep
-  Vdem <- amended$total_dem
-  Vtotal <- amended$total_total
-  Vmargin <- ((Vrep - Vdem) / Vtotal)
-  Smargin <- 0.5 * ((Srep - Sdem) / Stotal)
-  EG <- as.numeric(Vmargin - Smargin)
-  return(EG)
-}
+
+co_2008 <- co_data[[3]]
+co_2010 <- co_data[[4]]
+co_2012 <- co_data[[5]]
+co_2014 <- co_data[[6]]
+co_2016 <- co_data[[7]]
+co_2018 <- co_data[[8]]
+co_2020 <- co_data[[9]]
+co_2022 <- co_data[[10]]
+
+denver2022 <- co_2022 %>%
+  filter(county == "denver")
+
+denver2020 <- co_2020 %>%
+  filter(county=="denver")
+
+dprec <- rbind(denver2020, denver2022)
+
+dprec %>%
+  distinct(precinct)

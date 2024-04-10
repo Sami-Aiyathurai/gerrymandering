@@ -23,11 +23,11 @@ statewide_master <- function(x) {
 #' @param x data frame created by open_elections_factory and generate_data
 filter_statewide <- function(x) {
   x <- x %>%
-    filter(.data[["office"]] == "Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" |
+    filter(.data[["office"]] == "U.S. Senate" | .data[["office"]] == "President" | .data[["office"]] == "Attorney General" |
              .data[["office"]] == "Secretary of State" | .data[["office"]] == "Governor")
-  #x <- x[-c(1, 5:6)]
   return(x)
 }
+
 
 
 #' total_vote_func takes the filtered statewide information and finds
@@ -75,7 +75,7 @@ check_districts <- function(x) {
 #' behaved in a statewide race. This is used to create the baseline and estimate district behavior.
 #' @param x data frame of state assembly by district, as established by for loops
 #' @param y data frame of statewide data for the given year
-district_func <- function(x, y) {
+district_func <- function(x, y) { # changed the [] in statewide_x_year
   tv_sax_year <- total_vote_func(x)
   tv2p_sax_year <- total_2p_vote_func(x)
   sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
@@ -83,13 +83,15 @@ district_func <- function(x, y) {
   wards_sax_year <- data.frame(ward = check_wards(x))
   statewide_x_year <- y %>%
     dplyr::right_join(wards_sax_year, by = "ward")
-  statewide_x_year <- statewide_x_year[-(12:13)]
+  statewide_x_year <- statewide_x_year %>%
+    dplyr::select(-c(total_votes, total_votes_2p)) # this index chops off the total_votes and total_votes_2p columns!!
   tv_statewide_x_year <- total_vote_func(statewide_x_year)
   tv2p_statewide_x_year <- total_2p_vote_func(statewide_x_year)
   statewide_x_year <- vote_join(statewide_x_year, tv_statewide_x_year, tv2p_statewide_x_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
   district_x_year <- rbind(statewide_x_year, sax_year)
   district_x_year <- candidate_function(district_x_year)
+  return(district_x_year)
 }
 
 
