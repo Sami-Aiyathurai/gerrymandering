@@ -1,5 +1,6 @@
 ## Colorado!!
 
+## added str fixes to variable_prep
 variable_prep <- function(data) {
   data$party[data$party == "Democratic"] <- "DEM"
   data$party[data$party == "Democrat"] <- "DEM"
@@ -13,6 +14,8 @@ variable_prep <- function(data) {
   data$office[data$office == "Senate"] <- "U.S. Senate"
   data$office[data$office == "US Senate"] <- "U.S. Senate"
   data$precinct <- as.character(data$precinct)
+  data$county <- str_to_lower(data$county)
+  data$cw_concat <- paste(data$county, data$precinct, sep=" ")
   data$votes <- as.integer(data$votes)
   data$district <- as.numeric(data$district)
   data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
@@ -97,6 +100,7 @@ sa_contest_all_co <- function(data){ #mod function name
 }
 
 contested_co <- sa_contest_all_co(co_data)
+sa_contest_all_co(co_2012)
 
 # can use the same filtering as MI (for statewide_master and filter_statewide)
 
