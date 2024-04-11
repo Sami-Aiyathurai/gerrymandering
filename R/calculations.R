@@ -48,13 +48,13 @@ michigan(2022) #still doesn't work
 
 ## CO
 
-co_data <- open_elections_factor_co("co")
+co_data <- open_elections_factory_co("co")
 co_data <- generate_data_co(co_data)
 
 colorado <- function(year, ...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
-  votes_year <- year_baseline_data_co(year_num, co_data)
+  votes_year <- COyear_baseline_data(year_num, co_data)
   eg_year <- efficiency_gap_co(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested_co(votes_year, year_num)
 
@@ -87,8 +87,11 @@ pennsylvania <- function(year, ...) {
 wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2012), wisconsin(2014),
                 wisconsin(2016), wisconsin(2018), wisconsin(2020), wisconsin(2022))
 
-co_egs <- rbind(colorado(2008), colorado(2010), colorado(2014), colorado(2016),
+co_egs <- rbind(colorado(2008), colorado(2010), colorado(2012), colorado(2014), colorado(2016),
                 colorado(2018), colorado(2020), colorado(2022))
+
+## the 2018, 2020, and 2022 shouldn't be this aggressively different
+## need to examine in the morning
 
 mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
                 michigan(2016), michigan(2018), michigan(2020))
