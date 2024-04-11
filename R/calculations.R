@@ -53,8 +53,10 @@ co_data <- generate_data_co(co_data)
 
 colorado <- function(year, ...) {
   year <- as.character(year)
+  print(year)
   year_num <- as.numeric(year)
   votes_year <- COyear_baseline_data(year_num, co_data)
+  print(unique(votes_year$office))
   eg_year <- efficiency_gap_co(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested_co(votes_year, year_num)
 
@@ -64,6 +66,16 @@ colorado <- function(year, ...) {
                         State = "CO")
   return(co_year)
 }
+colorado(2008)
+# I think there's something funky happening in CO2008 now... sigh
+# time to trouble shoot!!
+colorado(2010)
+colorado(2012) # everything from 2010 on works perfectly fine
+colorado(2014)
+colorado(2016)
+colorado(2018)
+colorado(2020)
+colorado(2022)
 
 ## PA
 
@@ -89,9 +101,6 @@ wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2012), wisconsin(201
 
 co_egs <- rbind(colorado(2008), colorado(2010), colorado(2012), colorado(2014), colorado(2016),
                 colorado(2018), colorado(2020), colorado(2022))
-
-## the 2018, 2020, and 2022 shouldn't be this aggressively different
-## need to examine in the morning
 
 mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
                 michigan(2016), michigan(2018), michigan(2020))

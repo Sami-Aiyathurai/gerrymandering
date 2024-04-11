@@ -14,13 +14,18 @@ variable_prep <- function(data) {
   data$office[data$office == "Senate"] <- "U.S. Senate"
   data$office[data$office == "US Senate"] <- "U.S. Senate"
   data$precinct <- as.character(data$precinct)
+  #data$precinct <- str_to_lower(data$precinct)
   data$county <- str_to_lower(data$county)
   data$cw_concat <- paste(data$county, data$precinct, sep=" ")
   data$votes <- as.integer(data$votes)
   data$district <- as.numeric(data$district)
   data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
   data <- data %>%
-    dplyr::select(county, precinct, office, district, party, candidate, votes)
+    dplyr::select(county, precinct, cw_concat, office, district, party, candidate, votes) %>%
+    dplyr::filter(precinct!="provisional") %>%
+    dplyr::filter(precinct!="unmatched") %>%
+    dplyr::filter(office == "State House" | office == "President" | office == "U.S. Senate" |
+                    office == "Governor" | office == "Attorney General" | office == "Secretary of State")
   return(data)
 }
 
@@ -153,6 +158,7 @@ year_baseline_data_co <- function(year, data) {
   ve_list <- list()
 
   for (i in un_districts_main_year) {
+    print(i)
     temp <- uncon_main_year %>%
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))

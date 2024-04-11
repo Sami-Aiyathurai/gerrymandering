@@ -63,6 +63,7 @@ COyear_baseline_data <- function(year, data) {
     temp <- uncon_main_year %>%
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
+    print(i)
     dis_name <- as.character(i)
     print(dis_est)
     main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
@@ -72,7 +73,6 @@ COyear_baseline_data <- function(year, data) {
            l1 <- COprecincts_not_found(temp, main_year, statewide_main_year, statewide_main_minus_two,
                                        statewide_main_minus_four, dis_name, dis_est),
            l1 <- precincts_found(main_year, mainyearminus2, mainyearminus4, dis_name, districts))
-
     districts_full[i, ] <- as.data.frame(l1)
   }
   return(districts_full)
@@ -80,10 +80,17 @@ COyear_baseline_data <- function(year, data) {
 
 COyear_baseline_data(2012, co_data)
 
-COyear_baseline_data(2018, co_data)
+coybd2008 <- COyear_baseline_data(2008, co_data)
+coybd2018 <- COyear_baseline_data(2018, co_data)
+coybd2020 <- COyear_baseline_data(2020, co_data)
 
 ## INSERT THIS INTO YBDCO
 
 hd1412 <- co_2012 %>%
   filter(office == "State House" & district == 14) ## this district is UNCONTESTED
+
+hd808 <- co_2008 %>%
+  filter(office == "State House" & district == 8)
+
+main_year
 

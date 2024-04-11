@@ -24,7 +24,7 @@ COprecincts_not_found <- function(temp, main_year, statewide_main_year, statewid
         index <- list_grp[[j]]
         new_row <- statewide_main_minus_two[index, ]
         df1[nrow(df1) + 1,] <- new_row
-        print(j)
+        #print(j)
       }
     }
     for (k in seq_along(list_grp2)) {
@@ -32,13 +32,13 @@ COprecincts_not_found <- function(temp, main_year, statewide_main_year, statewid
         index <- list_grp2[[k]]
         setting_row <- statewide_main_minus_four[index, ]
         df2 <- as.data.frame(setting_row)
-        print(df2)
+        #print(df2)
       }
       else {
         index <- list_grp2[[k]]
         new_row <- statewide_main_minus_four[index, ]
         df2[nrow(df2) + 1,] <- new_row
-        print(k)
+        #print(k)
       }
     }
   }
@@ -94,9 +94,9 @@ districts_full <- data.frame(District = 1:65, # changed from 1:99 to 1:65 for al
                              Dem_votes = integer(length(1:65)),
                              Rep_votes = integer(length(1:65)),
                              Contested = character(length(1:65)))
-myear <- as.character(2012)
-myearm2 <- as.character((2010))
-myearm4 <- as.character((2008))
+myear <- as.character(2008)
+myearm2 <- as.character((2006))
+myearm4 <- as.character((2004))
 
 full_sa_di <- sa_contest_all_co(co_data) #mod
 
@@ -136,11 +136,11 @@ un_districts_main_year <- check_districts(uncon_main_year) # this is producing a
 districts <- list()
 ve_list <- list()
 
-for (i in un_districts_main_year) {
+#for (i in un_districts_main_year) {
   temp <- uncon_main_year %>%
-    dplyr::filter(.data[["district"]] == i) %>%
+    dplyr::filter(.data[["district"]] == 8) %>%
     dplyr::select(-c("contest_r", "contest_d", "contested"))
-  dis_name <- as.character(i)
+  dis_name <- as.character(8)
   print(dis_est)
   main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
   mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
@@ -150,8 +150,8 @@ for (i in un_districts_main_year) {
                                      statewide_main_minus_four, dis_name, dis_est),
          l1 <- precincts_found(main_year, mainyearminus2, mainyearminus4, dis_name, districts))
 
-  districts_full[i, ] <- as.data.frame(l1)
-}
+  #districts_full[i, ] <- as.data.frame(l1)
+#}
 
 
 
