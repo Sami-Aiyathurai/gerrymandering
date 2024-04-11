@@ -1,7 +1,11 @@
 ## CO baseline mods
 
 ## get it to work for CO 2012 -> need CO 2010, CO 2008
-
+co_2022 <- co_data[[10]]
+co_2020 <- co_data[[9]]
+co_2018 <- co_data[[8]]
+co_2016 <- co_data[[7]]
+co_2014 <- co_data[[6]]
 co_2012 <- co_data[[5]]
 co_2010 <- co_data[[4]]
 co_2008 <- co_data[[3]]
@@ -13,9 +17,9 @@ COyear_baseline_data <- function(year, data) {
                                Dem_votes = integer(length(1:65)),
                                Rep_votes = integer(length(1:65)),
                                Contested = character(length(1:65)))
-  myear <- as.character(2012)
-  myearm2 <- as.character((2010))
-  myearm4 <- as.character((2008))
+  myear <- as.character(year)
+  myearm2 <- as.character((year-2))
+  myearm4 <- as.character((year-4))
 
   full_sa_di <- sa_contest_all_co(co_data) #mod
 
@@ -60,12 +64,13 @@ COyear_baseline_data <- function(year, data) {
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
     dis_name <- as.character(i)
+    print(dis_est)
     main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
     mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
     mainyearminus4 <- district_func_precincts(temp, statewide_main_minus_four) # district_func_mi
     ifelse(mainyearminus2$year[1] == as.numeric(myear) | mainyearminus4$year[1] == as.numeric(myear),
            l1 <- COprecincts_not_found(temp, main_year, statewide_main_year, statewide_main_minus_two,
-                                       statewide_main_minus_four, dis_name),
+                                       statewide_main_minus_four, dis_name, dis_est),
            l1 <- precincts_found(main_year, mainyearminus2, mainyearminus4, dis_name, districts))
 
     districts_full[i, ] <- as.data.frame(l1)
@@ -74,6 +79,8 @@ COyear_baseline_data <- function(year, data) {
 }
 
 COyear_baseline_data(2012, co_data)
+
+COyear_baseline_data(2018, co_data)
 
 ## INSERT THIS INTO YBDCO
 
