@@ -20,7 +20,7 @@ variable_prep <- function(data) {
   data$district <- as.numeric(data$district)
   data$district <- as.integer(data$district) # do this to catch 2008 where it's a character
   data <- data %>%
-    select(county, precinct, office, district, party, candidate, votes)
+    dplyr::select(county, precinct, office, district, party, candidate, votes)
   return(data)
 }
 
