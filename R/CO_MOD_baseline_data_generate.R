@@ -9,8 +9,11 @@ co_2014 <- co_data[[6]]
 co_2012 <- co_data[[5]]
 co_2010 <- co_data[[4]]
 co_2008 <- co_data[[3]]
+co_2006 <- co_data[[2]]
 
 ## deconstruct YBD_CO
+
+# for some reason the loop like isn't working in 2008
 
 COyear_baseline_data <- function(year, data) {
   districts_full <- data.frame(District = 1:65, # changed from 1:99 to 1:65 for all of these
@@ -48,6 +51,7 @@ COyear_baseline_data <- function(year, data) {
       dplyr::select(.data[["district"]], .data[["DEM"]], .data[["REP"]], .data[["contested"]])
     districts_full[i, ] <- temp
   }
+
   dis_est <- districts_full %>% ## this produces an estimate of avg voters per CONTESTED district
     dplyr::filter(Contested == "contested") %>%
     mutate(total_votes = Dem_votes + Rep_votes) %>%
@@ -63,9 +67,7 @@ COyear_baseline_data <- function(year, data) {
     temp <- uncon_main_year %>%
       dplyr::filter(.data[["district"]] == i) %>%
       dplyr::select(-c("contest_r", "contest_d", "contested"))
-    print(i)
     dis_name <- as.character(i)
-    print(dis_est)
     main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
     mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
     mainyearminus4 <- district_func_precincts(temp, statewide_main_minus_four) # district_func_mi
@@ -78,19 +80,6 @@ COyear_baseline_data <- function(year, data) {
   return(districts_full)
 }
 
-COyear_baseline_data(2012, co_data)
-
 coybd2008 <- COyear_baseline_data(2008, co_data)
 coybd2018 <- COyear_baseline_data(2018, co_data)
 coybd2020 <- COyear_baseline_data(2020, co_data)
-
-## INSERT THIS INTO YBDCO
-
-hd1412 <- co_2012 %>%
-  filter(office == "State House" & district == 14) ## this district is UNCONTESTED
-
-hd808 <- co_2008 %>%
-  filter(office == "State House" & district == 8)
-
-main_year
-

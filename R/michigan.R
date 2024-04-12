@@ -26,8 +26,9 @@ open_elections_factory_mi <- function(state) {
       if (year == 2022) {
         data$votes <- as.numeric(data$votes)
         data$votes <- as.integer(data$votes)
-        data$absentee <- as.numeric(data$absentee)
-        data$absentee <- as.integer(data$absentee)
+        data <- data %>%
+          select(county, precinct, office, district, candidate, party, votes, contest_dem,
+                 contest_rep, cw_concat, year)
       }
     }
     data
@@ -62,7 +63,7 @@ mi_prep <- function(data) {
   data$precinct <- str_squish(data$precinct)
   data$cw_concat <- paste(data$county, data$precinct, sep=" ")
   data$cw_concat <- stri_replace_all_regex(data$cw_concat,
-                                           pattern=c("avcb", "district"), # just replace it see what happens
+                                           pattern="district", # just replace it see what happens
                                            replacement="precinct",
                                            vectorize=FALSE)
   data$cw_concat <- str_replace_all(data$cw_concat, "[^[:alnum:]]", " ")
@@ -312,4 +313,3 @@ efficiency_gap_contested_mi <- function(full_votes, year) {
   EG <- as.numeric(Vmargin - Smargin)
   return(EG)
 }
-

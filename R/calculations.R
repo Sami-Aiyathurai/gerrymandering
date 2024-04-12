@@ -2,6 +2,15 @@
 
 library(tidyverse)
 
+vote_prep <- function(full_votes) {
+  total_votes <- full_votes %>%
+    dplyr::group_by(.data[["District"]]) %>%
+    dplyr::summarize(total_votes = sum(.data[["Dem_votes"]], .data[["Rep_votes"]]))
+  full_votes <- full_votes %>%
+    dplyr::left_join(total_votes, by = "District")
+  return(full_votes)
+}
+
 ## Wisconsin 2010-2020
 
 wi_data <- open_elections_factory("wi")
@@ -12,7 +21,7 @@ wi_data <- generate_data(wi_data)
 wisconsin <- function(year, ...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
-  votes_year <- MZyear_baseline_data(year_num, wi_data)
+  votes_year <- WIyear_baseline_data(year_num, wi_data)
   eg_year <- efficiency_gap(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested(votes_year, year_num)
   wi_year <- data.frame(Year = year,
@@ -66,16 +75,6 @@ colorado <- function(year, ...) {
                         State = "CO")
   return(co_year)
 }
-colorado(2008)
-# I think there's something funky happening in CO2008 now... sigh
-# time to trouble shoot!!
-colorado(2010)
-colorado(2012) # everything from 2010 on works perfectly fine
-colorado(2014)
-colorado(2016)
-colorado(2018)
-colorado(2020)
-colorado(2022)
 
 ## PA
 
@@ -112,6 +111,3 @@ egs <- rbind(wi_egs, mi_egs, co_egs, pa_egs)
 
 
 write.csv(egs, "C:\\Users\\mzelloe\\Desktop\\egs.csv", row.names=FALSE)
-
-
-
