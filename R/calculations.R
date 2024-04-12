@@ -112,3 +112,6 @@ egs <- rbind(wi_egs, mi_egs, co_egs, pa_egs)
 
 
 write.csv(egs, "C:\\Users\\mzelloe\\Desktop\\egs.csv", row.names=FALSE)
+
+write.csv(co_egs, "C:\\Users\\mzelloe\\Desktop\\co_egs.csv", row.names=FALSE)
+write.csv(wi_egs, "C:\\Users\\mzelloe\\Desktop\\wi_egs.csv", row.names=FALSE)

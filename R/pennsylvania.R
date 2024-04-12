@@ -136,12 +136,16 @@ pa_2004_function <- function(pa_year) {
 
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun, mod_year$other_mun_id, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun,
+                               mod_year$other_mun_id, sep=" ")
   }
 
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  #mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
 
   mod_year <- mod_year %>%
     distinct()
@@ -196,12 +200,16 @@ pa_2006_function <- function(pa_year) {
 
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun, mod_year$other_mun_identifier, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun,
+                               mod_year$other_mun_identifier, sep=" ")
   }
 
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  #mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
 
   mod_year <- mod_year %>%
     distinct()
@@ -253,12 +261,16 @@ pa_2008_function <- function(pa_year) {
 
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun, mod_year$other_mun_identifier, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun,
+                               mod_year$other_mun_identifier, sep=" ")
   }
 
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+ # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
 
   mod_year <- mod_year %>%
     distinct()
@@ -305,15 +317,19 @@ pa_2010_function <- function(pa_year) {
 
   for (row in mod_2010) {
     mod_2010$candidate <- paste(mod_2010$first_name, mod_2010$last_name, sep=" ")
-    mod_2010$precinct <- paste(mod_2010$municipality_name, mod_2010$type_of_mun, mod_2010$other_mun_identifier, sep="")
+    mod_2010$precinct <- paste(mod_2010$municipality_name, mod_2010$type_of_mun,
+                               mod_2010$other_mun_identifier, sep=" ")
   }
-  mod_2010$precinct <- str_replace_all(string=mod_2010$precinct, pattern=" ", repl="")
+  #mod_2010$precinct <- str_replace_all(string=mod_2010$precinct, pattern=" ", repl="")
+  mod_2010$cw_concat <- paste(mod_2010$county_code, mod_2010$precinct)
   mod_2010$contest_dem <- ifelse(mod_2010$party == "DEM", 1, 0)
   mod_2010$contest_rep <- ifelse(mod_2010$party == "REP", 1, 0)
+  mod_2010$cw_concat <- str_squish(mod_2010$cw_concat)
+  mod_2010$cw_concat <- str_to_lower(mod_2010$cw_concat)
 
   mod_2010 <- mod_2010 %>%
     distinct()
-
+  print("2010")
   return(mod_2010)
 }
 
@@ -358,11 +374,15 @@ pa_2012_function <- function(pa_year) {
 
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun, mod_year$other_mun_identifier, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun,
+                               mod_year$other_mun_identifier, sep=" ")
   }
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  #mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
 
   mod_year <- mod_year %>%
     distinct()
@@ -427,11 +447,15 @@ pa_2014_function <- function(pa_year) {
   mod_year$candidate <- as.character(119502)
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun, mod_year$other_mun_identifier, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun,
+                               mod_year$other_mun_identifier, sep=" ")
   }
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  #mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
 
   mod_year <- mod_year %>%
     distinct()
@@ -490,11 +514,16 @@ pa_2016_function <- function(pa_year) {
   mod_year$candidate <- as.character(204012)
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun, mod_year$other_mun_identifier, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, mod_year$type_of_mun,
+                               mod_year$other_mun_identifier, sep=" ")
   }
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  #mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
+
   mod_year <- mod_year %>%
     distinct()
   return(mod_year)
@@ -555,11 +584,15 @@ pa_2018_function <- function(pa_year) {
   mod_year$candidate <- as.character(114233)
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
   }
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+ # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
+
   mod_year <- mod_year %>%
     distinct()
   return(mod_year)
@@ -615,11 +648,15 @@ pa_2020_function <- function(pa_year) {
   mod_year$candidate <- as.character(179507)
   for (row in mod_year) {
      mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-     mod_year$precinct <- paste(mod_year$municipality_name, sep="")
+     mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
    }
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+ # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
+
   mod_year <- mod_year %>%
     distinct()
 
@@ -676,15 +713,18 @@ pa_2022_function <- function(pa_year) {
 
   for (row in mod_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-    mod_year$precinct <- paste(mod_year$municipality_name, sep="")
+    mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
   }
-  mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+ # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
+  mod_year$cw_concat <- str_squish(mod_year$cw_concat)
+  mod_year$cw_concat <- str_to_lower(mod_year$cw_concat)
 
   mod_year <- mod_year %>%
     distinct()
-
+  print("2022")
   return(mod_year)
 }
 
@@ -692,7 +732,7 @@ pa_2022_function <- function(pa_year) {
 
 selecting_function <- function(pa_year) {
   pa_year <- pa_year %>%
-    dplyr::select(county_code, year, office, district, candidate, party, precinct, contest_dem, contest_rep, votes)
+    dplyr::select(county_code, year, office, district, candidate, cw_concat, party, precinct, contest_dem, contest_rep, votes)
   return(pa_year)
 }
 
