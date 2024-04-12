@@ -14,7 +14,7 @@ variable_prep <- function(data) {
   data$office[data$office == "Senate"] <- "U.S. Senate"
   data$office[data$office == "US Senate"] <- "U.S. Senate"
   data$precinct <- as.character(data$precinct)
-  #data$precinct <- str_to_lower(data$precinct)
+  data$precinct <- str_to_lower(data$precinct)
   data$county <- str_to_lower(data$county)
   data$cw_concat <- paste(data$county, data$precinct, sep=" ")
   data$votes <- as.integer(data$votes)
