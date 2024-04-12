@@ -159,8 +159,10 @@ district_func_precincts <- function(x, y) {
   sax_year <- vote_join(x, tv_sax_year, tv2p_sax_year) %>%
     dplyr::filter(.data[["party"]] == "DEM" | .data[["party"]] == "REP")
   wards_sax_year <- data.frame(precinct = check_precincts(x)) # did not change these variable names
+  print(unique(wards_sax_year))
   statewide_x_year <- y %>%
     dplyr::right_join(wards_sax_year, by = "precinct") # changed to precinct
+  print(unique(statewide_x_year))
   statewide_x_year <- statewide_x_year %>%
     dplyr::select(-c(total_votes, total_votes_2p))
   tv_statewide_x_year <- total_vote_func(statewide_x_year)

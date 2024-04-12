@@ -1,6 +1,9 @@
 ## CO variations of precincts_not_found
 
 # ## district_func for counties
+
+temp8 <-
+
 #
 # #district_func_precincts <- function(temp, statewide_main_year) {
 #   tv_sax_year <- total_vote_func(temp8)
@@ -26,6 +29,7 @@ COprecincts_not_found <- function(temp, main_year, statewide_main_year, statewid
     filter(office != "State House")
 
   str_county <- unique(main_year$county)
+  print(str_county)
   list_grp <- list()
   list_grp2 <- list()
   for (n in seq_along(str_county)) {
@@ -95,6 +99,9 @@ COvote_estimate <- function(trimmed_sa, dis_est) {
 ## ALL OF THESE ARE ACTUALLY CONTESTED
 
 ## everything below here is pulled out of the functions!
+
+## the precinct matcher isn't workign again..... it's 2008 CO
+
 
 districts_full <- data.frame(District = 1:65, # changed from 1:99 to 1:65 for all of these
                              Dem_votes = integer(length(1:65)),
