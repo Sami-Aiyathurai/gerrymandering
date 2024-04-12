@@ -13,7 +13,7 @@ vote_prep <- function(full_votes) {
 
 ## Wisconsin 2010-2020
 
-wi_data <- open_elections_factory("wi")
+wi_data <- open_elections_factory_wi("wi")
 wi_data <- generate_data(wi_data)
 
 # there's something wonky happening in year_baseline_data with 2012 but I don't feel like figuring it out right now so I won't!
@@ -54,6 +54,7 @@ michigan <- function(year,...) {
 }
 
 michigan(2022) #still doesn't work
+## I need to remove the districts that are uncontested
 
 ## CO
 
