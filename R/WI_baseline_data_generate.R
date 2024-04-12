@@ -1,4 +1,4 @@
-MZyear_baseline_data <- function(year, data) {
+WIyear_baseline_data <- function(year, data) {
   districts_full <- data.frame(District = 1:99,
                                Dem_votes = integer(length(1:99)),
                                Rep_votes = integer(length(1:99)),
@@ -50,7 +50,7 @@ MZyear_baseline_data <- function(year, data) {
     mainyearminus4 <- district_func(temp, statewide_main_minus_four)
     ifelse(mainyearminus2$year[1] == as.numeric(myear) | mainyearminus4$year[1] == as.numeric(myear),
            l1 <- precincts_not_found(temp, main_year, statewide_main_year, statewide_main_minus_two,
-                               statewide_main_minus_four, dis_name),
+                                     statewide_main_minus_four, dis_name),
            l1 <- precincts_found(main_year, mainyearminus2, mainyearminus4, dis_name, districts))
     #print("hello")
     #print(l1)
@@ -59,5 +59,3 @@ MZyear_baseline_data <- function(year, data) {
   }
   return(districts_full)
 }
-
-
