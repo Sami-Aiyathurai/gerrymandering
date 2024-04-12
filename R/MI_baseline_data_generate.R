@@ -3,7 +3,7 @@ mi_2022 <- mi_data[[12]]
 mi_2020 <- mi_data[[11]]
 mi_2018 <- mi_data[[10]]
 
-year_baseline_data_mi <- function(year, data) {
+MIyear_baseline_data <- function(year, data) {
   districts_full <- data.frame(District = 1:110, # changed from 1:99 to 1:110 for all of these
                                Dem_votes = integer(length(1:110)),
                                Rep_votes = integer(length(1:110)),
@@ -15,9 +15,6 @@ year_baseline_data_mi <- function(year, data) {
   full_sa_di <- sa_contest_all(data)
 
   main_year <- full_sa_di[[myear]]
-  # if (ncol(main_year) > 14) {
-  #   main_year <- subset(main_year, select = -c(election_day,absentee))
-  # }
   main_year_list <- split(main_year, main_year$contested)
   uncon_main_year <- main_year_list[["uncontested"]]
 
@@ -26,9 +23,6 @@ year_baseline_data_mi <- function(year, data) {
   main_minus_four <- access_state_year(myearm4, data)
 
   statewide_main_year <- statewide_master(main_year_state)
-  # if (ncol(statewide_main_year) > 13) {
-  #   statewide_main_year <- subset(statewide_main_year, select = -c(election_day,absentee) )
-  # }
   statewide_main_minus_two <- statewide_master(main_minus_two)
   statewide_main_minus_four <- statewide_master(main_minus_four)
 
@@ -58,9 +52,14 @@ year_baseline_data_mi <- function(year, data) {
     main_year <- district_func_precincts(temp, statewide_main_year) # district func mi
     mainyearminus2 <- district_func_precincts(temp, statewide_main_minus_two) # district_func_mi
     mainyearminus4 <- district_func_precincts(temp, statewide_main_minus_four) # district_func_mi
-    districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
-    districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
-    districts_full[i, ] <- districts[[dis_name]][["estimates"]]
+    ifelse(mainyearminus2$year[1] == as.numeric(myear) | mainyearminus4$year[1] == as.numeric(myear),
+           l1 <- precincts_not_found(temp, main_year, statewide_main_year, statewide_main_minus_two,
+                                     statewide_main_minus_four, dis_name),
+           l1 <- precincts_found(main_year, mainyearminus2, mainyearminus4, dis_name, districts))
+    districts_full[i, ] <- as.data.frame(l1)
   }
   return(districts_full)
 }
+
+year_baseline_data_mi(2022, mi_data)
+MIyear_baseline_data(2020, mi_data)
