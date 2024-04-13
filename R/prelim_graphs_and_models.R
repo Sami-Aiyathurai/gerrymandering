@@ -3,18 +3,29 @@
 library(rio)
 
 states <- import("StatesAndCyclesData_production-20240301a.csv")
+egs <- import("egs_mod2.csv")
+
 egs$Year <- as.numeric(egs$Year)
 egs$Year <- as.integer(egs$Year)
 
 egs$EG_pos <- abs(egs$Efficiency_gap)
 egs$EG <- egs$Efficiency_gap
 
-egs$primary <- as.character(1:30)
+egs <- egs %>%
+  dplyr::select(Year, EG, EG_pos, State, Seats, Institution, Legislature_Control, Governor,
+                Trifecta, State_Supreme_method) %>%
+  distinct()
 
-egs$primary[egs$State == "CO"] <- "Open to Unaffiliated"
+egs$primary <- as.character(1:29)
+
+egs$primary[egs$State == "CO"] <- "Semi"
 egs$primary[egs$State == "PA"] <- "Closed"
 egs$primary[egs$State == "WI"] <- "Open"
 egs$primary[egs$State == "MI"] <- "Open"
+
+egs$EG_pos <- abs(egs$Efficiency_gap)
+egs$EG <- egs$Efficiency_gap
+
 
 mod_state <- states %>%
   dplyr::select(State, `Cycle Year`, Level, Seats, Institution, `Party Control`, Governor) %>% #`Plan Status`) %>%
