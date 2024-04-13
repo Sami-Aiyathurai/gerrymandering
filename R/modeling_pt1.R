@@ -22,11 +22,11 @@ egs_mod <- import("egs_mod2.csv")
 
 summary(egs_mod)
 
-egs_mod$State <- as.factor(egs_mod$State)
-egs_mod$Trifecta <- as.factor(egs_mod$Trifecta)
-egs_mod$Institution <- as.factor(egs_mod$Institution)
-egs_mod$State_Supreme_method <- as.factor(egs_mod$State_Supreme_method)
-egs_mod$primary <- as.factor(egs_mod$primary)
+egs$State <- as.factor(egs$State)
+egs$Trifecta <- as.factor(egs$Trifecta)
+egs$Institution <- as.factor(egs$Institution)
+egs$State_Supreme_method <- as.factor(egs$State_Supreme_method)
+egs$primary <- as.factor(egs$primary)
 
 ggplot(egs_mod, aes(x=Efficiency_gap)) +
   geom_histogram()
@@ -95,6 +95,11 @@ mcmc_acf(vpc5, pars=c("sigma", "(Intercept)"))
 mcmc_hist(vpc5)
 mcmc_trace(vpc5)
 mcmc_dens_overlay(vpc5) # these are all pretty good
+waic(vpc5)
+loo(vpc5)
+
+vpc1egs <- stan_glmer(formula=EG_pos~1+(1|State), family=gaussian, data=egs, seed=15345,
+                      iter=50000, warmup=7500, thin=5, chains=4)
 
 ri1 <- stan_glmer(formula=Efficiency_gap~Trifecta+(1|State), family=gaussian, data=egs_mod,
                   seed=349, iter=20000, warmup=2500, thin=5, chains=4)
@@ -105,6 +110,7 @@ mcmc_acf(ri1, pars=c("sigma", "(Intercept)"))
 mcmc_hist(ri1)
 mcmc_trace(ri1)
 mcmc_dens_overlay(ri1)
+loo(ri1)
 plot(ranef(ri1))
 
 ri2 <- stan_glmer(formula=Efficiency_gap~Institution+(1|State), family=gaussian, data=egs_mod,
@@ -116,7 +122,7 @@ mcmc_acf(ri2, pars=c("sigma", "(Intercept)"))
 mcmc_hist(ri2)
 mcmc_trace(ri2)
 mcmc_dens_overlay(ri2) # these look good
-
+loo(ri2)
 
 ri3 <- stan_glmer(formula=Efficiency_gap~State_Supreme_method+(1|State), family=gaussian, data=egs_mod,
                   seed=349, iter=20000, warmup=2500, thin=5, chains=4)

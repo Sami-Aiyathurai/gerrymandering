@@ -13,24 +13,6 @@ yb2016 <- year_baseline_data(2016, wi_data)
 
 kable(yb2014)
 
-library(rio)
-egs <- import("egs_mod2.csv")
-
-egs$EG_pos <- abs(egs$Efficiency_gap)
-egs$EG <- egs$Efficiency_gap
-
-egs <- egs %>%
-  dplyr::select(Year, EG, EG_pos, State, Seats, Institution, Legislature_Control, Governor,
-         Trifecta, State_Supreme_method) %>%
-  distinct()
-
-egs$primary <- as.character(1:30)
-
-egs$primary[egs$State == "CO"] <- "Open to Unaffiliated"
-egs$primary[egs$State == "PA"] <- "Closed"
-egs$primary[egs$State == "WI"] <- "Open"
-egs$primary[egs$State == "MI"] <- "Open"
-
 ## MPSA SUMMARY STATS AND STUFF
 
 ## eg_pos
