@@ -29,7 +29,7 @@ open_elections_factory_wi <- function(state) {
 wi_data <- open_elections_factory_wi("wi")
 wi_data <- generate_data(wi_data) # this worked for creating the things
 
-## te
+## I'm not sure if this is necessary might be deletable
 
 districts_full <- data.frame(District = 1:99,
                              Dem_votes = integer(length(1:99)),
@@ -82,20 +82,20 @@ MODmainyearminus2 <- MODdistrict_func(temp, statewide_main_minus_two)
 MODmainyearminus4 <- MODdistrict_func(temp, statewide_main_minus_four)
 
 #for (i in un_districts_main_year) {
-  temp <- uncon_main_year %>%
-    dplyr::filter(.data[["district"]] == i) %>%
-    dplyr::select(-c("contest_r", "contest_d", "contested"))
-  dis_name <- as.character(i)
-  main_year <- district_func(temp, statewide_main_year) ## use mod dis func (change dis func!!)
-  mainyearminus2 <- district_func(temp, statewide_main_minus_two)
-  mainyearminus4 <- district_func(temp, statewide_main_minus_four)
+temp <- uncon_main_year %>%
+  dplyr::filter(.data[["district"]] == i) %>%
+  dplyr::select(-c("contest_r", "contest_d", "contested"))
+dis_name <- as.character(i)
+main_year <- district_func(temp, statewide_main_year) ## use mod dis func (change dis func!!)
+mainyearminus2 <- district_func(temp, statewide_main_minus_two)
+mainyearminus4 <- district_func(temp, statewide_main_minus_four)
 
-  # ifelse(mainyearminus2$year != as.numeric(myearm2) | mainyearminus4$year != as.numeric(myearm4), ## check to make sure it doesn't appear within the year column
-         ## write function that will perform the shit, else do nothing)
+# ifelse(mainyearminus2$year != as.numeric(myearm2) | mainyearminus4$year != as.numeric(myearm4), ## check to make sure it doesn't appear within the year column
+## write function that will perform the shit, else do nothing)
 
-  districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
-  districts[[dis_name]][["estimates"]] <- MODdis_baseline_ve(i, districts[[dis_name]][["data"]])
-  districts_full[i, ] <- districts[[dis_name]][["estimates"]]
+districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
+districts[[dis_name]][["estimates"]] <- MODdis_baseline_ve(i, districts[[dis_name]][["data"]])
+districts_full[i, ] <- districts[[dis_name]][["estimates"]]
 }
 
 ## make this work outside the functions
@@ -138,7 +138,7 @@ for (i in seq_along(cw_concat)) {
 ## this is the function that will get called in the ifelse
 redis_wards <- function(MODmain_year, MODmainyearminus2, MODmainyearminus4, myear) { # remember this is for a district!!
   ## shit above goes in here
-  }
+}
 }
 
 redis_wards(temp)
@@ -182,4 +182,3 @@ MODdistrict_func <- function(state_assem_dis_year_data, statewide_year_data) {
   district_x_year <- candidate_function(district_x_year)
   return(district_x_year)
 }
-1

@@ -41,7 +41,13 @@ mi_data <- generate_data(mi_data)
 michigan <- function(year,...) {
   year <- as.character(year)
   year_num <- as.numeric(year)
-  votes_year <- year_baseline_data_mi(year_num, mi_data)
+  if (year_num <= 2020) {
+    votes_year <- year_baseline_data_mi(year_num, mi_data)
+  }
+  if (year_num == 2022) {
+    votes_year <- MIyear_baseline_data(year_num, mi_data)
+  }
+
   print(votes_year)
   eg_year <- efficiency_gap_mi(votes_year, year_num)
   eg_con_year <- efficiency_gap_contested_mi(votes_year, year_num)
@@ -96,6 +102,28 @@ pennsylvania <- function(year, ...) {
   return(pa_year)
 }
 
+
+## OH
+
+oh_data
+
+ohio <- function(year, ...) {
+  year <- as.character(year)
+  year_num <- as.numeric(year)
+  votes_year <- OHyear_baseline_data(year_num, oh_data)
+  eg_year <- OHefficiency_gap(votes_year, year_num)
+  eg_con_year <- OHefficiency_gap_contested(votes_year, year_num)
+
+  oh_year <- data.frame(Year = year,
+                        Efficiency_gap = eg_year,
+                        Efficiency_gap_contested = eg_con_year,
+                        State = "OH")
+  return(oh_year)
+}
+
+oh_egs <- rbind(ohio(2008), ohio(2010), ohio(2012), ohio(2014), ohio(2016), ohio(2018),
+                ohio(2020), ohio(2022))
+
 wi_egs <- rbind(wisconsin(2008), wisconsin(2010), wisconsin(2012), wisconsin(2014),
                 wisconsin(2016), wisconsin(2018), wisconsin(2020), wisconsin(2022))
 
@@ -103,15 +131,17 @@ co_egs <- rbind(colorado(2008), colorado(2010), colorado(2012), colorado(2014), 
                 colorado(2018), colorado(2020), colorado(2022))
 
 mi_egs <- rbind(michigan(2008), michigan(2010), michigan(2012), michigan(2014),
-                michigan(2016), michigan(2018), michigan(2020))
+                michigan(2016), michigan(2018), michigan(2020), michigan(2022))
 
 pa_egs <- rbind(pennsylvania(2008), pennsylvania(2010), pennsylvania(2012), pennsylvania(2014),
                 pennsylvania(2016), pennsylvania(2018), pennsylvania(2020), pennsylvania(2022))
 
 egs <- rbind(wi_egs, mi_egs, co_egs, pa_egs)
 
+egs <- import("EGs.csv")
+new_egs <- rbind(egs, oh_egs)
 
-write.csv(egs, "C:\\Users\\mzelloe\\Desktop\\egs.csv", row.names=FALSE)
+write.csv(egs, "C:\\Users\\mzelloe\\Documents\\egs.csv", row.names=FALSE)
 
-write.csv(co_egs, "C:\\Users\\mzelloe\\Desktop\\co_egs.csv", row.names=FALSE)
-write.csv(wi_egs, "C:\\Users\\mzelloe\\Desktop\\wi_egs.csv", row.names=FALSE)
+# write.csv(co_egs, "C:\\Users\\mzelloe\\Desktop\\co_egs.csv", row.names=FALSE)
+# write.csv(wi_egs, "C:\\Users\\mzelloe\\Desktop\\wi_egs.csv", row.names=FALSE)

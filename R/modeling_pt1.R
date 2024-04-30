@@ -1,200 +1,509 @@
-## Summary statistics
-library(rio)
-library(foreign)
-library(ggplot2)
-library(tidyverse)
-library(broom)
-library(bayesplot)
-library(rstanarm)
-library(MCMCpack)
-library(dplyr)
-library(parameters)
-library(bayestestR)
-library(loo)
-library(coda)
-library(sjPlot)
-library(augment)
-library(sjmisc)
-library(sjlabelled)
-library(tidyverse)
+## final modeling attempts
 
-egs_mod <- import("egs_mod2.csv")
+## creating a VPC
 
-summary(egs_mod)
+### rerun using egs_mod w/ OH
 
-egs$State <- as.factor(egs$State)
-egs$Trifecta <- as.factor(egs$Trifecta)
-egs$Institution <- as.factor(egs$Institution)
-egs$State_Supreme_method <- as.factor(egs$State_Supreme_method)
-egs$primary <- as.factor(egs$primary)
 
-ggplot(egs_mod, aes(x=Efficiency_gap)) +
-  geom_histogram()
-ggplot(egs_mod, aes(x=Institution)) +
-  geom_bar()
-ggplot(egs_mod, aes(x=State_Supreme_method)) +
-  geom_bar()
+# egs_mod <- import("egs_mod_fin.csv")
 
-## Need to prove that MLM is needed
+egs_mod$gov_bin <- ifelse(egs_mod$gov_control == "D", 0, 1)
 
-m1 <- stan_glm(Efficiency_gap~Institution+State_Supreme_method+State+Year+Governor+Legislature_Control+Trifecta,
-                 family=gaussian, data=egs_mod, seed=349)
-summary(m1, digits=3)
-print(m1, digits=3)
+vpc1 <- stan_glmer(eg~1+(1|state), family=gaussian, data=egs_mod, seed=1546)
+vpc1pct <- stan_glmer(eg_pct~1+(1|state), family=gaussian, data=egs_mod, seed=12345,
+                      iter=2000)
 
-## Building Bayesian Multilevel Models
+mcmc_acf(vpc1pct)
+mcmc_trace(vpc1pct)
+mcmc_hist(vpc1pct)
+mcmc_dens_overlay(vpc1pct)
 
-## Building the VPC
+print(vpc1, digits=2)
+print(vpc1pct, digits=2)
 
-# - no independent variables, estimate the extnt to which clustering occurs within a group
-# - estimate the intercept value, interclass correlation (the proportion of the DV attributed to clustering)
+summary(vpc1, digits=2)
+summary(vpc1pct, digits=2)
 
-vpc1 <- stan_glmer(formula=EG~1+(1|State), family=gaussian, data=egs, seed=349)
+mcmc_acf(vpc1pct)
 
-print(vpc1, digits=3)
-summary(vpc1, digits=3)
-mcmc_acf(vpc1, pars=c("sigma", "(Intercept)"))
-mcmc_hist(vpc1)
-mcmc_trace(vpc1)
-mcmc_dens_overlay(vpc1)
-
-vpc2 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349, iter=4000,
-                   warmup=2000, thin=5)
-print(vpc2, digits=3)
-summary(vpc2, digits=3)
-mcmc_acf(vpc2, pars=c("sigma", "(Intercept)"))
-mcmc_hist(vpc2)
-mcmc_trace(vpc2)
-mcmc_dens_overlay(vpc2)
-
-# summary gives intercept for each country, print gives the relationships
-
-vpc3 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349,
-                   iter=10000, warmup=2500, thin=5)
-print(vpc3, digits=3)
-summary(vpc3,digits=3)
-mcmc_acf(vpc3, pars=c("sigma", "(Intercept)"))
-mcmc_hist(vpc3)
-mcmc_trace(vpc3)
-mcmc_dens_overlay(vpc3)
-
-vpc4 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349,
-                   iter=15000, warmup=2500, thin=5, chains=4) # modified VPC4 to have no more than 15000, smaller WU, 4 chains
-print(vpc4, digits=3)
-summary(vpc4,digits=3)
-mcmc_acf(vpc4, pars=c("sigma", "(Intercept)"))
-mcmc_hist(vpc4)
-mcmc_trace(vpc4)
-mcmc_dens_overlay(vpc4) # fits a lot better
-
-vpc5 <- stan_glmer(formula=Efficiency_gap~1+(1|State), family=gaussian, data=egs_mod, seed=349,
+vpc5 <- stan_glmer(formula=eg~1+(1|state), family=gaussian, data=egs_mod, seed=12345,
                    iter=20000, warmup=2500, thin=5, chains=4)
-print(vpc5, digits=3)
-summary(vpc5,digits=3)
-mcmc_acf(vpc5, pars=c("sigma", "(Intercept)"))
-mcmc_hist(vpc5)
-mcmc_trace(vpc5)
-mcmc_dens_overlay(vpc5) # these are all pretty good
-waic(vpc5)
-loo(vpc5)
+vpc5pct <- stan_glmer(formula=eg_pct~1+(1|state), family=gaussian, data=egs_mod, seed=12345,
+                      iter=20000, warmup=2500, thin=5, chains=4)
+vpc5pct <- stan_glmer(formula=eg_pct~1+(1|state), family=gaussian, data=egs_mod, seed=12345,
+                      iter=30000, warmup=2500, thin=4, chains=4)
 
-vpc1egs <- stan_glmer(formula=EG_pos~1+(1|State), family=gaussian, data=egs, seed=15345,
-                      iter=50000, warmup=7500, thin=5, chains=4)
+mcmc_acf(vpc5pct)
+mcmc_hist(vpc5pct)
+mcmc_trace(vpc5pct)
+mcmc_dens_overlay(vpc5pct)
 
-ri1 <- stan_glmer(formula=Efficiency_gap~Trifecta+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
-# no more divergences! yay! these are the settings I should use then
-print(ri1, digits=3)
-summary(ri1,digits=3)
-mcmc_acf(ri1, pars=c("sigma", "(Intercept)"))
-mcmc_hist(ri1)
-mcmc_trace(ri1)
-mcmc_dens_overlay(ri1)
-loo(ri1)
-plot(ranef(ri1))
+## making vpc plot to visualize
 
-ri2 <- stan_glmer(formula=Efficiency_gap~Institution+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
-## no divergences
-print(ri2, digits=3)
-summary(ri2,digits=3)
-mcmc_acf(ri2, pars=c("sigma", "(Intercept)"))
-mcmc_hist(ri2)
-mcmc_trace(ri2)
-mcmc_dens_overlay(ri2) # these look good
-loo(ri2)
+coef(vpc5pct)$state
 
-ri3 <- stan_glmer(formula=Efficiency_gap~State_Supreme_method+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
-## lol 118 divergences
-print(ri3, digits=3)
-summary(ri3,digits=3)
-mcmc_acf(ri3, pars=c("sigma", "(Intercept)"))
-mcmc_hist(ri3) # these don't look great
-mcmc_trace(ri3)
-mcmc_dens_overlay(ri3)
-plot(ranef(ri3))
-
-plot(ranef(vpc5))
-
-ri4 <- stan_glmer(formula=Efficiency_gap~primary+(1|State), family=gaussian, data=egs_mod,
-                  seed=349, iter=20000, warmup=2500, thin=5, chains=4)
-## 73 divergences
-print(ri4, digits=3)
-summary(ri4,digits=3)
-mcmc_acf(ri4, pars=c("sigma", "(Intercept)"))
-mcmc_hist(ri4) # these don't look great
-mcmc_trace(ri4)
-mcmc_dens_overlay(ri4)
-
-model_parameters(vpc5, centrality="median", ci=0.95, ci_method="hdi", digits=3)
-model_parameters(ri3, centrality="median", ci=0.95, ci_method="hdi", digits=3)
-model_parameters(ri1, centrality="median", ci=0.95, ci_method="hdi", digits=3)
-
-## don't forget waic(vpc5) and how to interpret it
-
-## Interpreting the VPC
-print(vpc5, digits=3)
-summary(vpc5, digits=3)
-dotplot(ranef(vpc5))
-
-## 7.164% of the variance is explained by state level differences, 4.207% by individuals
-## VPC = 7.164/(7.164+4.207) = 63.00%
-# this means that 63% of the variance appears to be associated with differences between states
-
-# - print(vpc7)
-# - country std dev 1.765
-# - 1.765% of the variance is explained by country level differences, 2.606% is explained by individual level differences.
-# - residual: 2.606
-# - VPC = 1.765/(1.765+2.606) = 0.4038
-# - 40.38% of variance appears to be associated with differences between countries.
-# - amount of variation in the outcome that exists between individuals
-# - country intercept as proportion of country + residual (STD add)
-
-## Interpreting RI
-print(ri1, digits=3)
-
-summary(ri3, digits=3)
-
-ranefri1 <- as.data.frame(ranef(ri1))
-
-ggplot(ranefri1, aes(x=condval, y=grp)) +
-  geom_point()
+ggplot(egs_mod, aes(x=year, y=eg_pct)) +
+  geom_point(aes(color=state)) +
+  geom_abline(intercept=4.462635) +
+  geom_abline(intercept=)
 
 
-## 6.435/(4.305+6.435) = 59.9162% of the variation is associated with differences between countries
 
-# - remember: random intercept implies that each country has the same relationship between the two variables, they just have different starting points
-# - VPC 1.733 / (1.733+2.603) = 39.97% variation is associated with differences between countries
-# - 1.733 is the variation explained by country level
-# - 2.603 is the variation explained by individual level
-# rn.b.ri2 <- ranef(b.ri2)
-# df.rn.b.ri2 <- as.data.frame(rn.b.ri2)
+# changing the settings so maybe it converges??
+print(vpc5, digits=2)
+print(vpc5pct, digits=2)
+
+summary(vpc5, digits=2)
+summary(vpc5pct, digits=2)
+
+## RANDOM INTERCEPTS
+# when I ran it with gov_bin it didn't work & family = gaussian
+ri_gov <- stan_glmer(formula=eg_pct~gov_control+(1|state), family=gaussian, data=egs_mod,
+                     seed=12345, iter=30000, warmup=2500, thin=4, chains=4)
+print(ri_gov)
+summary(ri_gov)
+
+ri_gov2 <- stan_glmer(formula=eg_pct~gov_control+(1|state), family=gaussian, data=egs_mod,
+                      seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+ranef(ri_gov2)
+
+model_parameters(ri_gov2, centrality="median", ci_method="hdi")
+## this is a BINARY variable dumbass
+
+model_parameters(ri_gov, ci=0.95, ci_method="hdi")
+
+ri_leg <- stan_glmer(formula=eg_pct~leg_control+(1|state), family=gaussian, data=egs_mod,
+                     seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+model_parameters(ri_leg, ci=0.95, ci_method="hdi")
+ranrileg <- ranef(ri_leg)$state
+plot(ranef(ri_leg))
+
+random_intercepts_df <- data.frame(Group = rownames(ranrileg), Intercept = ranrileg)
+
+# Plot the random intercepts
+ggplot(random_intercepts_df, aes(x = Group, y = X.Intercept.)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +  # Add a dashed line at y = 0 for reference
+  xlab("Grouping Variable") +
+  ylab("Random Intercept") +
+  ggtitle("Random Intercept Plot")
+
+## 5 divergences, but no divergences when thin=5
+
+## seed is 12345
+
+ri_tri1 <- stan_glmer(formula=eg_pct~trifecta+(1|state), family=gaussian, data=egs_mod,
+                      seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+ri_tri <- stan_glmer(formula=eg_pct~trifecta+(1|state), family=gaussian, data=egs_mod,
+                     seed=12345, iter=30000, warmup=2500, thin=4, chains=4)
+
+model_parameters(ri_tri1, ci=0.95, ci_method="hdi")
+
+loo1 <- loo(vpc5pct, save_psis=TRUE)
+
+yrep1 <- posterior_predict(ri_gov)
+ppc_loo_pit_overlay(
+  y=egs_mod$gov_control,
+  yrep=yrep1,
+  lw=weights(loo2$psis_object)
+)
+
+loo_vpc <- loo(vpc5pct, save_psis=TRUE)
+loo_gov <- loo(ri_gov2, save_psis=TRUE)
+loo_leg <- loo(ri_leg, save_psis=TRUE)
+loo_tri <- loo(ri_tri1, save_psis=TRUE)
+
+ri_inst <- stan_glmer(formula=eg_pct~institution+(1|state), family=gaussian, data=egs_mod,
+                      seed=12345, iter=20000, warmup=2500, thin=5, chains=4) # no div
+loo_inst <- loo(ri_inst, k_threshold = 0.7, save_psis=TRUE) # one pareto k > 0.7
+## 1 divergence
+loo_inst
+model_parameters(ri_inst, ci=0.95, ci_method="hdi")
+summary(ri_inst)
+
+model_parameters(ri_simpinst, ci=0.95, ci_method="hdi")
+
+ranefrileg <- ranef(ri_leg)
+
+ri_simpinst <- stan_glmer(formula=eg_pct~simp_inst+(1|state), family=gaussian, data=egs_mod,
+                          seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+## converges!!
+
+ri_sup <- stan_glmer(formula=eg_pct~state_supreme+(1|state), family=gaussian, data=egs_mod,
+                     seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+model_parameters(ri_sup, ci=0.95, ci_method="hdi")
+model_parameters(ri_simpsup, ci=0.95, ci_method="hdi")
+
+ri_simpsup <- stan_glmer(formula=eg_pct~state_supcat+(1|state), family=gaussian, data=egs_mod,
+                         seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+
+ri_pri <- stan_glmer(formula=eg_pct~primary+(1|state), family=gaussian, data=egs_mod,
+                     seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+## everything ran but state sup and inst normal
+## do an RI with inst, leg
 #
-# ggplot(euro.short, aes(x=fairelcc, y=accalaw)) +
-#   geom_jitter() +
-#   geom_path(x=0, y=-1.656, color="red")
-#
-# ggplot(df.rn.b.ri2, aes(y=condval, color=grp)) +
-#   geom_line()
+# ri_inst_leg <- stan_glmer(formula=eg_pct~institution*leg_control+(1|state), family=gaussian, data=egs_mod,
+#                       seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
 
+loo(vpc5pct) #224
+loo(ri_gov2) #219
+loo(ri_leg) #212 !!
+loo(ri_tri1) # 221
+loo(ri_inst, k_threshold=0.7) # pareto k thing
+loo(ri_simpinst) # 222
+loo(ri_sup) #225
+loo(ri_pri) #224
+loo(ri3) # 213
+loo(ri4) # 215
+
+## Graph for GOV EFFECT
+
+
+
+
+# ri <- c(-2.8, 7.40, -0.38, 1.25, -3.16, -5.05)
+# rep <- c(-6.6, 3.6, -3.98, -2.55, -6.96, -8.85)
+# slope <- -3.80
+
+#
+# df1 <- data.frame(group = group,
+#                   random_intercept=ri,
+#                   ends=rep,
+#                   x=1)
+#
+# ggplot(df1, aes(x=rep, y=ri)) +
+#   geom_point(aes(color=group))
+#
+# ggplot(df1, aes(x = group, y = ri)) +
+#   geom_abline(intercept = 11.2, slope = slope, linetype = "dashed", color = "gray") +
+#   geom_abline(intercept = 14, slope=slope, linetype="dashed", color="gray") +
+#   geom_abline(intercept = 12.9, slope=slope, linetype="dashed", color="gray") +
+#   geom_abline(intercept = 12.1, slope=slope, linetype="dashed", color="gray") +
+#   geom_abline(intercept = 7.2, slope=slope, linetype="dashed", color="gray") +
+#   geom_point(aes(color=group, size=3)) +
+#   geom_text(aes(label = ri), vjust = -0.5, size = 3) +
+#   labs(x = "Group", y = "Random Intercept", title = "Random Intercept Model Plot") +
+#   theme_minimal()
+#
+# plot(ranef(ri))
+
+loo(rs1) ## no additional explanatory power, 214.7 (7.4)
+
+print(ri_leg)
+summary(ri_leg)
+
+summary(rs1, digits=2)
+model_parameters(rs1, ci=0.95, ci_method="hdi", digits=2)
+model_parameters(rsinst, ci=0.95, ci_method="hdi")
+model_parameters(rs2, ci=0.95, ci_method="hdi")
+summary(rsinst, digits=2)
+ranef(rsinst)
+ranef(rs2)
+
+loo(rs1)
+loo(rsinst)
+loo(rs2, k_threshold=0.7)
+
+rs1 <- stan_glmer(eg_pct~leg_control+(1+leg_control|state), family=gaussian,
+                  data=egs_mod, seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+
+rsinst <- stan_glmer(eg_pct~institution+(1+institution|state), family=gaussian,
+                     data=egs_mod, seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+
+rs2 <- stan_glmer(eg_pct~leg_control+institution+(1+leg_control+institution|state), family=gaussian,
+                  data=egs_mod, seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+
+rs3 <- stan_glmer(eg_pct~leg_control+gov_control+institution+(1+leg_control+institution|state),
+                  data=egs_mod, seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+
+##
+## effect now that leg_control has on each state
+
+ri3 <- stan_glmer(eg_pct~leg_control+simp_inst+(1|state), family=gaussian,
+                  data=egs_mod, seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+ri4 <- stan_glmer(eg_pct~gov_control+leg_control+simp_inst+(1|state), family=gaussian,
+                  data=egs_mod, seed=12345, iter=20000, warmup=2500, thin=5, chains=4)
+
+coef(ri_sup)
+
+plot(coef(ri_sup)$state)
+
+summary(ri_gov2, digits=2)
+
+# testing the interaction between the two
+loo(ri_inst_leg)
+
+model_parameters(ri_simpinst, ci=0.95, ci_method="hdi")
+model_parameters(ri_inst, ci=0.95, ci_method="hdi")
+model_parameters(ri_pri, ci=0.95, ci_method="hdi")
+model_parameters(ri_sup, ci=0.95, ci_method="hdi")
+
+model_parameters(ri_inst_leg, ci=0.95, ci_method="hdi")
+# ri_tri1 has seed of 12345
+#ri_tri has seed of 123456
+# converges for 12345 does not converge for 123456
+
+states <- c("CO", "MI", "OH", "PA", "WI")
+
+X1 <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+
+## LEG
+
+leg1 <- 0.12
+leg2 <- -7.05
+leg3 <- -0.70
+
+X1 <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+Z2 <- (4.63, -0.24, 1.19, -1.93, -3.56, 4.63, -0.24, 1.19, -1.93, -3.56,
+       4.63-sqrt(48.7025), -0.24-sqrt(48.7025), 1.19-sqrt(48.7025), -1.93-sqrt(48.7025), -3.56-sqrt(48.7025),
+       4.63-sqrt(48.7025), -0.24, 1.19, -1.93, -3.56,
+)
+
+
+govs1 <- -2.82
+govs2 <- -3.8
+
+Z1 <- c(7.40, -0.38, 1.25, -3.16, -5.05, 7.40, -0.38, 1.25, -3.16, -5.05,
+        (7.4-sqrt(13.44)-0.1), (-0.38-sqrt(13.44)-0.1),
+        (1.25-sqrt(13.44)-0.1), (-3.16-sqrt(13.44)-0.1), (-5.05-sqrt(13.44)-0.1),
+        (7.4-sqrt(6.9524)-0.1), (-0.38-sqrt(6.9524)-0.1),
+        (1.25-sqrt(6.9524)-0.1), (-3.16-sqrt(6.9524)-0.1), (-5.05-sqrt(6.9524)-0.1))
+
+## MAKING GRAPH FOR BOTH SETS OF VALUES (GOV) ## do not use ##
+
+govdf <- data.frame(x=X1, y=Z1, group=states)
+
+ggplot(govdf, aes(x=X1, y=Z1)) +
+  geom_abline(intercept=7.40, slope=govs2, linetype="solid", color="red") +
+  geom_abline(intercept=-0.38, slope=govs2, linetype="solid", color="red") +
+  geom_abline(intercept=1.25, slope=govs2, linetype="solid", color="red") +
+  geom_abline(intercept=-3.16, slope=govs2, linetype="solid", color="red") +
+  geom_abline(intercept=-5.05, slope=govs2, linetype="solid", color="red") +
+  geom_abline(intercept=7.40, slope=govs1, linetype="dashed", color="blue") +
+  geom_abline(intercept=-0.38, slope=govs1, linetype="dashed", color="blue") +
+  geom_abline(intercept=1.25, slope=govs1, linetype="dashed", color="blue") +
+  geom_abline(intercept=-3.16, slope=govs1, linetype="dashed", color="blue") +
+  geom_abline(intercept=-5.05, slope=govs1, linetype="dashed", color="blue") +
+  geom_text(aes(x=0, y=7, label="CO")) +
+  geom_text(aes(x=0, y=1.7, label="OH")) +
+  geom_text(aes(x=0, y=0.1, label="MI")) +
+  geom_text(aes(x=0, y=-2.7, label="PA")) +
+  geom_text(aes(x=0, y=-4.6, label="WI")) +
+  #geom_text(aes(x=0.5, y=-4, label="Effect of Republican control = -3.6"), size=3, color="black", angle=-18) +
+  xlab("Governor party") +
+  ylab("Efficiency gap (%)") +
+  geom_point() +
+  scale_y_continuous(breaks=seq(-8, 8, 2),
+                     labels=c("-8", "-6", "-4", "-2", "0", "2", "4", "6", "8")) +
+  scale_x_continuous(breaks=seq(0, 1, 1),
+                     labels=c("Democrat", "Republican")) +
+  labs(col="State") +
+  theme_minimal()
+
+## graphing!!
+
+## summary stats
+
+ggplot(egs_mod, aes(x=year, y=eg_pct)) +
+  #facet_wrap(~state) +
+  geom_point(aes(color=state)) +
+  geom_smooth() +
+  geom_hline(yintercept=8, linetype="dashed") +
+  geom_hline(yintercept=-8, linetype="dashed") +
+  xlab("Year") +
+  ylab("Efficiency gap") +
+  scale_color_discrete("State") +
+  scale_y_continuous(breaks=seq(-20, 16, 4),
+                     labels=c("-20", "-16", "-12", "-8", "-4", "0", "4", "8", "12", "16")) +
+  theme_bw()
+
+ggplot(egs_mod, aes(x=state, y=eg_pct)) +
+  geom_boxplot() +
+  geom_hline(yintercept=8, linetype="dashed") +
+  geom_hline(yintercept=-8, linetype="dashed") +
+  scale_y_continuous(breaks=seq(-16, 12, 4),
+                     labels=c("-16", "-12", "-8", "-4", "0",
+                              "4", "8", "12")) +
+  xlab("State") +
+  ylab("Efficiency gap (%)") +
+  theme_bw()
+
+
+ggplot(egs_mod, aes(x=leg_control, y=eg_pct)) +
+  #facet_wrap(~state) +
+  geom_point(aes(color=state)) +
+  geom_smooth() +
+  xlab("Year") +
+  ylab("Efficiency gap") +
+  scale_color_discrete("State") +
+  scale_y_continuous(breaks=seq(-20, 16, 4),
+                     labels=c("-20", "-16", "-12", "-8", "-4", "0", "4", "8", "12", "16")) +
+  theme_bw()
+## replicate this for each explanatory
+
+ggplot(egs_mod, aes(x=gov_control)) +
+  geom_bar() +
+  facet_wrap(~state) +
+  xlab("Party controlling governorship") +
+  ylab("Count") +
+  theme_bw()
+
+ggplot(egs_mod, aes(x=leg_control)) +
+  geom_bar() +
+  facet_wrap(~state) +
+  xlab("Party controlling both legislative chambers") +
+  ylab("Count") +
+  theme_light()
+
+ggplot(egs_mod, aes(x=trifecta)) +
+  geom_bar() +
+  facet_wrap(~state) +
+  xlab("Trifecta status") +
+  ylab("Count") +
+  theme_bw()
+
+## need to remove the labs
+
+lab1 <- c("Independent \ncommission", "Legislature",
+          "Politician \ncommission")
+ggplot(egs_mod, aes(x=institution)) +
+  geom_bar() +
+  facet_wrap(~state) +
+  xlab("Institution controlling redistricting") +
+  ylab("Count") +
+  scale_x_discrete(labels=lab1) +
+  theme_bw()
+
+lab2 <- c("Governor \nappointment", "Nonpartisan \nelection", "Partisan \nelection")
+ggplot(egs_mod, aes(x=state_supreme)) +
+  geom_bar() +
+  facet_wrap(~state) +
+  xlab("Appointment method for state supreme court judges") +
+  ylab("Count") +
+  scale_x_discrete(labels=lab2) +
+  theme_bw()
+
+lab3 <- c( "Closed", "Open","Semi")
+ggplot(egs_mod, aes(x=primary)) +
+  geom_bar() +
+  facet_wrap(~state) +
+  xlab("Primary system") +
+  ylab("Count") +
+  scale_x_discrete(labels=lab3) +
+  theme_bw()
+
+## EFFECT OF GOV PARTY
+
+group <- c("CO", "MI", "OH", "PA", "WI")
+
+X1 <- c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1)
+Y1 <- c(7.40, -0.38, 1.25, -3.16, -5.05,
+        (7.4-sqrt(13.44)-0.1), (-0.38-sqrt(13.44)-0.1),
+        (1.25-sqrt(13.44)-0.1), (-3.16-sqrt(13.44)-0.1), (-5.05-sqrt(13.44)-0.1)) ## where Y2 is result of Y1 fudged a little
+Y2 <- c( 7.40, -0.38, 1.25, -3.16, -5.05,
+         (-2.8-3.46-0.4), (7.4-3.46-0.4), (-0.38-3.46-0.4),
+         (1.25-3.46-0.4), (-3.16-3.46-0.4), (-5.05-3.46-0.4))
+
+
+df2 <- data.frame(group=group,
+                  x=X1, y=Y1)
+
+ggplot(df2, aes(x=X1, y=Y1)) +
+  geom_abline(intercept=7.40, slope=slope, linetype="solid", color="gray") +
+  #geom_abline(intercept=-2.8, slope=slope, linetype="solid", color="gray") +
+  geom_abline(intercept=-0.38, slope=slope, linetype="dashed", color="gray") +
+  geom_abline(intercept=1.25, slope=slope, linetype="dashed", color="gray") +
+  geom_abline(intercept=-3.16, slope=slope, linetype="dashed", color="gray") +
+  geom_abline(intercept=-5.05, slope=slope, linetype="solid", color="gray") +
+  #geom_text(aes(x=0.5, y=-4, label="Effect of Republican control = -3.6"), size=3, color="black", angle=-18) +
+  xlab("Governor party") +
+  ylab("Efficiency gap (%)") +
+  geom_point(aes(color=group)) +
+  scale_y_continuous(breaks=seq(-8, 8, 2),
+                     labels=c("-8", "-6", "-4", "-2", "0", "2", "4", "6", "8")) +
+  scale_x_continuous(breaks=seq(0, 1, 1),
+                     labels=c("Democrat", "Republican")) +
+  labs(col="State") +
+  theme_minimal()
+
+## version without MEDIAN
+
+
+ggplot(df2, aes(x=X1, y=Y1)) +
+  geom_abline(intercept=7.40, slope=slope, linetype="solid", color="gray") +
+  geom_abline(intercept=-2.8, slope=slope, linetype="solid", color="gray") +
+  geom_abline(intercept=-0.38, slope=slope, linetype="dashed", color="gray") +
+  geom_abline(intercept=1.25, slope=slope, linetype="dashed", color="gray") +
+  geom_abline(intercept=-3.16, slope=slope, linetype="dashed", color="gray") +
+  geom_abline(intercept=-5.05, slope=slope, linetype="solid", color="gray") +
+  #geom_text(aes(x=0.5, y=-4, label="Effect of Republican control = -3.6"), size=3, color="black", angle=-18) +
+  xlab("Governor party") +
+  ylab("Efficiency gap (%)") +
+  geom_point(aes(color=group)) +
+  scale_y_continuous(breaks=seq(-8, 8, 2),
+                     labels=c("-8", "-6", "-4", "-2", "0", "2", "4", "6", "8")) +
+  scale_x_continuous(breaks=seq(0, 1, 1),
+                     labels=c("Democrat", "Republican")) +
+  labs(col="State") +
+  theme_minimal()
+
+
+## graph for LEG EFFECT
+slope3 <- -7.05
+X3 <- c(0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1)
+Y3 <- c(0.12, 4.63, -0.24, 1.19, -1.93, -3.56,
+        0.12-sqrt(48.7025)-0.1, 4.63-sqrt(48.7025)-0.1, -0.24-sqrt(48.7025)-0.1,
+        1.19-sqrt(48.7025)-0.1, -1.93-sqrt(48.7025)-0.1, -3.56-sqrt(48.7025)-0.1)
+df3 <- data.frame(group=group,
+                  x=X3, y=Y3)
+ggplot(df3, aes(x=X3, y=Y3)) +
+  geom_abline(intercept=4.63, slope=slope3, linetype="solid", color="gray") +
+  geom_abline(intercept=0.12, slope=slope3, linetype="solid", color="gray") +
+  geom_abline(intercept=-0.24, slope=slope3, linetype="dashed", color="gray") +
+  geom_abline(intercept=1.19, slope=slope3, linetype="dashed", color="gray") +
+  geom_abline(intercept=-1.93, slope=slope3, linetype="dashed", color="gray") +
+  geom_abline(intercept=-3.56, slope=slope3, linetype="solid", color="gray") +
+  #geom_text(aes(x=0.5, y=-4, label="Effect of Republican control = -3.6"), size=3, color="black", angle=-18) +
+  xlab("Legislature party") +
+  ylab("Efficiency gap (%)") +
+  geom_point(aes(color=group)) +
+  scale_y_continuous(breaks=seq(-12, 6, 2),
+                     labels=c("-12", "-10", "-8", "-6", "-4", "-2", "0", "2", "4", "6")) +
+  scale_x_continuous(breaks=seq(0, 1, 1),
+                     labels=c("Democrat", "Republican")) +
+  labs(col="State") +
+  theme_minimal()
+
+### EFFECT OF REP TRIFECTA
+
+slope4 <- -5.82
+slope5 <- -3.24
+
+X4 <- c(0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1)
+Y4 <- c(-0.54, 6.70, -0.11, 1.17, -2.88, -4.97,
+        -0.54-sqrt(32.8724)-0.1, 6.70-sqrt(32.8724)-0.1, -0.11-sqrt(32.8724)-0.1,
+        1.17-sqrt(32.8724)-0.1, -2.88-sqrt(32.8724)-0.1, -4.97-sqrt(32.8724)-0.1)
+
+df4 <- data.frame(group=group,
+                  x=X4, y=Y4)
+
+ggplot(df4, aes(x=X4, y=Y4)) +
+  geom_abline(intercept=6.70, slope=slope4, linetype="solid", color="gray") +
+  geom_abline(intercept=-0.54, slope=slope4, linetype="solid", color="gray") +
+  geom_abline(intercept=-0.11, slope=slope4, linetype="dashed", color="gray") +
+  geom_abline(intercept=1.17, slope=slope4, linetype="dashed", color="gray") +
+  geom_abline(intercept=-2.88, slope=slope4, linetype="dashed", color="gray") +
+  geom_abline(intercept=-4.97, slope=slope4, linetype="solid", color="gray") +
+  #geom_text(aes(x=0.5, y=-4, label="Effect of Republican control = -3.6"), size=3, color="black", angle=-18) +
+  xlab("Trifecta") +
+  ylab("Efficiency gap (%)") +
+  geom_point(aes(color=group)) +
+  scale_y_continuous(breaks=seq(-12, 6, 2),
+                     labels=c("-12", "-10", "-8", "-6", "-4", "-2", "0", "2", "4", "6")) +
+  scale_x_continuous(breaks=seq(0, 1, 1),
+                     labels=c("Democrat", "Republican")) +
+  labs(col="State") +
+  theme_minimal()

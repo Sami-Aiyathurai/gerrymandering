@@ -76,8 +76,6 @@ year_baseline_data <- function(year, data) {
     districts[[dis_name]][["data"]] <- rbind(main_year,  mainyearminus2, mainyearminus4)
     districts[[dis_name]][["estimates"]] <- dis_baseline_ve(i, districts[[dis_name]][["data"]])
     districts_full[i, ] <- districts[[dis_name]][["estimates"]]
-    }
+  }
   return(districts_full)
 }
-
-

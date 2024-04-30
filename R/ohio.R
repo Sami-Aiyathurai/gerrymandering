@@ -1,45 +1,76 @@
 # OHIO
 
-open_elections_factory_oh <- function(state) {
-  dates = c("2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
-  temp1 <-paste("https://raw.githubusercontent.com/openelections/openelections-data-",state,"/master", sep = "")
-  if (state == "oh"){
-    temp2 <- paste("__",state,"__general__precinct.csv", sep = "")
-  }else {
-    stop("This package does not have the functionality for state: ", state)
-  }
 
-  read <- function(year){
-    date <- dates[year]
-    temp3 <- paste(date,temp2, sep = "")
-    url <- file.path(temp1 , year, temp3)
-    data <- utils::read.csv(url)
-    for (district in data) {
-      data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
-      data$contest_rep <- ifelse(data$party == "REP", 1, 0)
-      data$year <- as.numeric(year)
-    }
-    data
-  }
-}
+oh_data
 
-generate_data_oh <- function(oe_data){
-  dfs <- list()
-  for(i in seq(2010, 2020, 2)){
+
+OHsa_contest_all <- function(data){
+  sa_contest_dfs <- list()
+  for(i in seq(2004, 2022, 2)) { # changed to include 2022
     year <- toString(i)
-    dfs[[year]] <- oe_data(year)
+    print(year)
+    year_data <- access_state_year(year, data)
+    print(head(year_data))
+    sa_contest_dfs[[year]] <- contest_di(year_data)
   }
-  return(dfs)
+  return(sa_contest_dfs)
+}
+OHsa_contest_all(oh_data)
+
+
+
+OHefficiency_gap <- function(full_votes, year) { #changed the default table
+  mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
+                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99),
+                      Dem_seats = c(53, 40, 39, 34, 33, 38, 35, 32),
+                      Rep_seats = c(46, 59, 60, 65, 66, 61, 64, 67)
+  )
+  myear <- as.character(year)
+  wi_sa_year <- mi_sa %>%
+    dplyr::filter(.data[["Year"]] == myear)
+  Stotal <- wi_sa_year$Total_seats[1]
+  Sdem <- wi_sa_year$Dem_seats[1]
+  Srep <- wi_sa_year$Rep_seats[1]
+  amended <- vote_prep(full_votes) %>%
+    dplyr::mutate(OH = "OH") %>% #changed from wi to mi
+    dplyr::group_by(.data[["OH"]]) %>%
+    dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
+                     total_rep = sum(.data[["Rep_votes"]]),
+                     total_total = sum(.data[["total_votes"]]))
+  Vrep <- amended$total_rep
+  Vdem <- amended$total_dem
+  Vtotal <- amended$total_total
+  Vmargin <- ((Vrep - Vdem) / Vtotal)
+  Smargin <- 0.5 * ((Srep - Sdem) / Stotal)
+  EG <- as.numeric(Vmargin - Smargin)
+  return(EG)
 }
 
-## No OH precinct level data for 2000, 2002, 2004, 2008 but starting at 2010 just because for the functions
-
-## OH 2012 is SEPARATED INTO different files (presidential, house, senate, state house/senate)
-## OH 2010 does not have party labels but everything from 2012 on DOES
-
-oh_data <- open_elections_factory_oh("oh")
-
-oh_data <- generate_data_oh(oh_data)
-
-
-
+OHefficiency_gap_contested <- function(full_votes, year) {
+  mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
+                      Total_seats = c(99, 99, 99, 99, 99, 99, 99, 99),
+                      Dem_seats = c(53, 40, 39, 34, 33, 38, 35, 32),
+                      Rep_seats = c(46, 59, 60, 65, 66, 61, 64, 67)
+  )
+  myear <- as.character(year)
+  wi_sa_year <- mi_sa %>%
+    dplyr::filter(.data[["Year"]] == myear)
+  Stotal <- wi_sa_year$Total_seats[1]
+  Sdem <- wi_sa_year$Dem_seats[1]
+  Srep <- wi_sa_year$Rep_seats[1]
+  full_votes_cont <- full_votes %>%
+    dplyr::filter(.data[["Contested"]] == "contested")
+  amended <- vote_prep(full_votes_cont) %>%
+    dplyr::mutate(OH = "OH") %>%
+    dplyr::group_by(.data[["OH"]]) %>%
+    dplyr::summarize(total_dem = sum(.data[["Dem_votes"]]),
+                     total_rep = sum(.data[["Rep_votes"]]),
+                     total_total = sum(.data[["total_votes"]]))
+  Vrep <- amended$total_rep
+  Vdem <- amended$total_dem
+  Vtotal <- amended$total_total
+  Vmargin <- ((Vrep - Vdem) / Vtotal)
+  Smargin <- 0.5 * ((Srep - Sdem) / Stotal)
+  EG <- as.numeric(Vmargin - Smargin)
+  return(EG)
+}

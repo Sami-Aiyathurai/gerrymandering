@@ -157,4 +157,3 @@ vp1 <- stan_glmer(formula=EG_pos~1+(1|State), family=gaussian, data=egs, seed=34
 print(vp1, digits=3) # has one divergence
 print(vpc1, digits=3)
 
-

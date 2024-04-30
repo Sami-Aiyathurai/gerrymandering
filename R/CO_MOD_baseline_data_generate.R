@@ -80,10 +80,8 @@ COyear_baseline_data <- function(year, data) {
   return(districts_full)
 }
 
-## I think this is returning null in some cases.... UGH
-## might've been D8, D32 in 2008 and maybe one or two in 2010
-## in 2018 and 2020 and maybe 2016
-
 coybd2008 <- COyear_baseline_data(2008, co_data)
+coybd2012 <- COyear_baseline_data(2012, co_data)
+
 coybd2018 <- COyear_baseline_data(2018, co_data)
 coybd2020 <- COyear_baseline_data(2020, co_data)

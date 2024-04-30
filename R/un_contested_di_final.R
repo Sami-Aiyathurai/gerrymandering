@@ -55,6 +55,3 @@ sa_contest_all<- function(data){
   }
   return(sa_contest_dfs)
 }
-
-
-

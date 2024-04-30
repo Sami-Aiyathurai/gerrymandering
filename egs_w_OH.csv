@@ -1,0 +1,41 @@
+"year","eg","eg_con","state","eg_pos","level","total_seats","institution","leg_control","gov_control","trifecta","state_supreme","primary","simp_inst","state_supcat","eg_pct","gov_bin"
+"2008",-0.0103704673973978,-0.0408763726007529,"OH",0.0103704673973978,"State Lower",99,"Politician commission","Split","D",NA,"Nonpartisan Election","Semi","Commission","Election",-1.03704673973978,0
+"2010",-0.0354157441596691,-0.00968438439186083,"OH",0.0354157441596691,"State Lower",99,"Politician commission","R","R","R","Nonpartisan Election","Semi","Commission","Election",-3.54157441596691,1
+"2012",-0.099435065875256,-0.0735561119860813,"OH",0.099435065875256,"State Lower",99,"Politician commission","R","R","R","Nonpartisan Election","Semi","Commission","Election",-9.9435065875256,1
+"2014",-0.0336139892100777,-0.0189029270727325,"OH",0.0336139892100777,"State Lower",99,"Politician commission","R","R","R","Nonpartisan Election","Semi","Commission","Election",-3.36139892100777,1
+"2016",-0.0444609024575001,-0.0643054318011077,"OH",0.0444609024575001,"State Lower",99,"Politician commission","R","R","R","Nonpartisan Election","Semi","Commission","Election",-4.44609024575001,1
+"2018",-0.0530259429555086,-0.0214095912810914,"OH",0.0530259429555086,"State Lower",99,"Politician commission","R","R","R","Nonpartisan Election","Semi","Commission","Election",-5.30259429555086,1
+"2020",-0.052460537398381,-0.0501116100811877,"OH",0.052460537398381,"State Lower",99,"Politician commission","R","R","R","Nonpartisan Election","Semi","Commission","Election",-5.2460537398381,1
+"2022",-0.0580604175521268,-0.0527848206044674,"OH",0.0580604175521268,"State Lower",99,"Politician commission","R","R","R","Partisan Election","Semi","Commission","Election",-5.80604175521268,1
+"2008",-0.0389230890749304,0.0407512665405954,"WI",0.0389230890749304,"State Lower",99,"Legislature","D","D","Split","Nonpartisan Election","Open","Legislature","Election",-3.89230890749304,0
+"2010",-0.0662307623098542,-0.00959264453699479,"WI",0.0662307623098542,"State Lower",99,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-6.62307623098542,1
+"2012",-0.111464894468109,-0.0533097025508366,"WI",0.111464894468109,"State Lower",99,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-11.1464894468109,1
+"2014",-0.11747741408073,0.0220305777044955,"WI",0.11747741408073,"State Lower",99,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-11.747741408073,1
+"2016",-0.123263448887591,0.0363502363048823,"WI",0.123263448887591,"State Lower",99,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-12.3263448887591,1
+"2018",-0.134114667424248,0.00196368085366558,"WI",0.134114667424248,"State Lower",99,"Legislature","R","D","Split","Nonpartisan Election","Open","Legislature","Election",-13.4114667424248,0
+"2020",-0.089160959292942,-0.0779556179981063,"WI",0.089160959292942,"State Lower",99,"Legislature","R","D","Split","Nonpartisan Election","Open","Legislature","Election",-8.9160959292942,0
+"2022",-0.137123157832785,-0.0939448392278581,"WI",0.137123157832785,"State Lower",99,"Legislature","R","D","Split","Nonpartisan Election","Open","Legislature","Election",-13.7123157832785,0
+"2008",-0.0406187907387362,0.0125515750537448,"MI",0.0406187907387362,"State Lower",110,"Legislature","Split","D","Split","Nonpartisan Election","Open","Legislature","Election",-4.06187907387362,0
+"2010",-0.0180149568171657,-0.0269711876078431,"MI",0.0180149568171657,"State Lower",110,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-1.80149568171657,1
+"2012",-0.122293432980785,-0.130601185790947,"MI",0.122293432980785,"State Lower",110,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-12.2293432980785,1
+"2014",-0.0971335194554184,-0.0971335194554184,"MI",0.0971335194554184,"State Lower",110,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-9.71335194554184,1
+"2016",-0.0720641817419063,-0.0720641817419063,"MI",0.0720641817419063,"State Lower",110,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-7.20641817419063,1
+"2018",-0.0747955865144317,-0.0747955865144317,"MI",0.0747955865144317,"State Lower",110,"Legislature","R","R","R","Nonpartisan Election","Open","Legislature","Election",-7.47955865144317,1
+"2020",-0.0260615486769666,-0.0242058567151572,"MI",0.0260615486769666,"State Lower",110,"Legislature","R","D","Split","Nonpartisan Election","Open","Legislature","Election",-2.60615486769666,0
+"2022",0.00143385573504977,0.0141934940273051,"MI",0.00143385573504977,"State Lower",110,"Independent commission","D","D","Split","Nonpartisan Election","Open","Commission","Election",0.143385573504977,0
+"2008",0.0248333227766476,0.0274616415575567,"CO",0.0248333227766476,"State Lower",65,"Politician commission","D","D","D","Governor Assisted Appointment","Semi","Commission","Governor Appointment",2.48333227766476,0
+"2010",0.0431136505204686,0.00681818194943855,"CO",0.0431136505204686,"State Lower",65,"Politician commission","Split","D","Split","Governor Assisted Appointment","Semi","Commission","Governor Appointment",4.31136505204686,0
+"2012",0.0116759731610192,-0.0284216915477266,"CO",0.0116759731610192,"State Lower",65,"Politician commission","D","D","Split","Governor Assisted Appointment","Semi","Commission","Governor Appointment",1.16759731610192,0
+"2014",0.0511810860576229,0.0260229340291033,"CO",0.0511810860576229,"State Lower",65,"Politician commission","Split","D","Split","Governor Assisted Appointment","Semi","Commission","Governor Appointment",5.11810860576229,0
+"2016",0.0748545921027417,0.0901924958246546,"CO",0.0748545921027417,"State Lower",65,"Politician commission","Split","D","Split","Governor Assisted Appointment","Semi","Commission","Governor Appointment",7.48545921027417,0
+"2018",0.0474331279020986,0.0810803338416252,"CO",0.0474331279020986,"State Lower",65,"Politician commission","D","D","D","Governor Assisted Appointment","Semi","Commission","Governor Appointment",4.74331279020986,0
+"2020",0.0592470148955519,0.083814110318661,"CO",0.0592470148955519,"State Lower",65,"Politician commission","D","D","D","Governor Assisted Appointment","Semi","Commission","Governor Appointment",5.92470148955519,0
+"2022",0.0998237604388199,0.0953524144353076,"CO",0.0998237604388199,"State Lower",65,"Independent commission","D","D","D","Governor Assisted Appointment","Semi","Commission","Governor Appointment",9.98237604388199,0
+"2008",-0.0489055076865325,0.0105540710277889,"PA",0.0489055076865325,"State Lower",203,"Politician commission","Split","D","Split","Partisan Election","Closed","Commission","Election",-4.89055076865325,0
+"2010",-0.0691397316986645,0.0268346082036145,"PA",0.0691397316986645,"State Lower",203,"Politician commission","R","R","R","Partisan Election","Closed","Commission","Election",-6.91397316986645,1
+"2012",-0.0951898509169717,-0.0204163625999381,"PA",0.0951898509169717,"State Lower",203,"Politician commission","R","R","R","Partisan Election","Closed","Commission","Election",-9.51898509169717,1
+"2014",-0.152398312615934,0.0267303609543416,"PA",0.152398312615934,"State Lower",203,"Politician commission","R","R","Split","Partisan Election","Closed","Commission","Election",-15.2398312615934,1
+"2016",-0.126573660324154,-0.00854441305883266,"PA",0.126573660324154,"State Lower",203,"Politician commission","R","D","Split","Partisan Election","Closed","Commission","Election",-12.6573660324154,0
+"2018",-0.0677095863660525,0.0426422351896148,"PA",0.0677095863660525,"State Lower",203,"Politician commission","R","D","Split","Partisan Election","Closed","Commission","Election",-6.77095863660525,0
+"2020",-0.0519641616094425,-0.0199598997581466,"PA",0.0519641616094425,"State Lower",203,"Politician commission","R","D","Split","Partisan Election","Closed","Commission","Election",-5.19641616094425,0
+"2022",-0.00120396866082786,-0.0242978888403827,"PA",0.00120396866082786,"State Lower",203,"Politician commission","Split","D","Split","Partisan Election","Closed","Commission","Election",-0.120396866082786,0

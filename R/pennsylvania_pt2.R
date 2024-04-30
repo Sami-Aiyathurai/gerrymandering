@@ -162,4 +162,3 @@ efficiency_gap_contested_pa <- function(full_votes, year) {
   EG <- as.numeric(Vmargin - Smargin)
   return(EG)
 }
-

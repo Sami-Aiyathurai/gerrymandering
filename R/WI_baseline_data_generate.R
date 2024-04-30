@@ -59,3 +59,5 @@ WIyear_baseline_data <- function(year, data) {
   }
   return(districts_full)
 }
+
+ybd2012 <- WIyear_baseline_data(2012, wi_data)

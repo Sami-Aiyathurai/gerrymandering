@@ -46,8 +46,10 @@ precincts_not_found <- function(temp, main_year, statewide_main_year, statewide_
 }
 
 precincts_found <- function(main_year, mainyearminus2, mainyearminus4, dis_name, districts) {
+  print("precincts found!")
   districts[[dis_name]][["data"]] <- rbind(main_year, mainyearminus2, mainyearminus4)
   obj <- dis_baseline_ve(dis_name, districts[[dis_name]][["data"]])
+  print(obj)
   return(obj)
 }
 

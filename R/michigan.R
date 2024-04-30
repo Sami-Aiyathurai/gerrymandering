@@ -4,6 +4,8 @@
 
 ## Functions to load the data
 
+
+
 open_elections_factory_mi <- function(state) {
   dates = c("2000"="20001107", "2002"="20021105", "2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="20161108", "2018"="20181106", "2020"="20201103", "2022"="20221108")
   temp1 <-paste("https://raw.githubusercontent.com/openelections/openelections-data-",state,"/master", sep = "")
@@ -19,21 +21,57 @@ open_elections_factory_mi <- function(state) {
     url <- file.path(temp1 , year, temp3)
     data <- utils::read.csv(url)
     for (district in data) {
+      if (year == 2022) {
+        str(data$district)
+        data <- data %>%
+          dplyr::select(county, precinct, office, district, candidate, party, votes) %>%
+          dplyr::filter(!district %in% c(35, 36, 43, 64, 71, 75, 78, 79, 97, 103, 109))
+        # district != 35 | district != 36 | district != 43 | district != 71 |
+        #                   district != 75 | district != 78 | district != 79 | district != 97 |
+        #                   district != 103 | district != 109)
+        print(unique(data$district))
+        county <- c("wayne")
+        precinct <- c("p1", "p1", "p2", "p2", "p3", "p3", "p4", "p4", "p9", "p9",
+                      "p35", "p35", "p36", "p36", "p43", "p43", "p64", "p64",
+                      "p71", "p71", "p75", "p75", "p78", "p78", "p79", "p79",
+                      "p97", "p97", "p103", "p103", "p109", "p109")
+        office <- c("State House")
+        district <- c(1, 1, 2, 2, 3, 3, 4, 4, 9, 9, 35, 35, 36, 36, 43, 43, 64, 64,
+                      71, 71, 75, 75, 78, 78, 79, 79, 97, 97, 103, 103, 109, 109)
+        candidate <- c("Tyrone Carter", "Paula Campbell", "Tullio Liberati", "Michael D'Onofrio",
+                       "Alabas Farhat", "Ginger Shearer", "Karen Whitsett", "Tonya Wells",
+                       "Abraham Aiyash", "Michelle Lundgren", "Andrew Watkins", "Andrew Fink",
+                       "Roger Williams", "Steve Carra", "Mark Ludwig", "Rachelle Smit",
+                       "Charles Howell", "Andrew Beller", "Mark Zacharda", "Brian BeGole",
+                       "Penelope Tsernoglou", "Chris Stewart", "Leah Groves", "Gina Johnsen",
+                       "Kimberly Kennedy-Barrington", "Angela Rigas", "Paul Whitney", "Matthew Bierlein",
+                       "Betsy Coffia", "Jack O'Malley", "Jenn Hill", "Melody Wagner")
+        party <- c("DEM", "REP")
+        votes <- c(14484, 1790, 18847, 12083,
+                   15595, 5308, 16990, 2520,
+                   17821, 1634, 9407, 25210,
+                   10979, 21589, 12771, 30920,
+                   14653, 23216, 18408, 25156,
+                   26106, 17406, 13533, 25765,
+                   15360, 29510, 14028, 28024,
+                   27805, 27040, 21899, 19438)
+
+        df1 <- as.data.frame(cbind(county, precinct, office, district, candidate, party, votes))
+        df1$votes <- as.numeric(df1$votes)
+        df1$votes <- as.integer(df1$votes)
+        df1$district <- as.numeric(df1$district)
+        df1$district <- as.integer(df1$district)
+        data <- rbind(df1, data)
+      }
       data <- mi_prep(data)
       data$year <- as.numeric(year)
-
-
-      if (year == 2022) {
-        data$votes <- as.numeric(data$votes)
-        data$votes <- as.integer(data$votes)
-        data <- data %>%
-          select(county, precinct, office, district, candidate, party, votes, contest_dem,
-                 contest_rep, cw_concat, year)
-      }
     }
     data
   }
 }
+
+mi_data <- open_elections_factory_mi("mi")
+mi_data <- generate_data(mi_data)
 
 generate_data <- function(oe_data){
   dfs <- list()
@@ -50,6 +88,11 @@ access_state_year <- function(year, data){
 }
 
 mi_prep <- function(data) {
+  data$office <- as.character(data$office)
+  data$district <- as.numeric(data$district)
+  data$district <- as.integer(data$district)
+  data$votes <- as.numeric(data$votes)
+  data$votes <- as.integer(data$votes)
   data$contest_dem <- ifelse(data$party == "DEM", 1, 0)
   data$contest_rep <- ifelse(data$party == "REP", 1, 0)
   data <- data %>%
@@ -68,11 +111,40 @@ mi_prep <- function(data) {
                                            vectorize=FALSE)
   data$cw_concat <- str_replace_all(data$cw_concat, "[^[:alnum:]]", " ")
   data$cw_concat <- str_squish(data$cw_concat)
+  #if (data$year[1] ==)
   return(data)
 }
+# ## this is incomplete and it needs to be done properly
+# mi_2022_prep <- function(year_data) {
+#   year_data$candidate <- as.character(nrow(year_data))
+#   year_data$district <- as.character(nrow(year_data))
+#   year_data$candidate <- paste(year_data$CandidateFirstName, year_data$CandidateLastName, sep=" ")
+#   #names(year_data)[names(year_data) == "DistrictCode(Text)"] <- "district"
+#   names(year_data)[names(year_data) == "CountyName"] <- "county"
+#   names(year_data)[names(year_data) == "OfficeDescription"] <- "office"
+#   names(year_data)[names(year_data) == "PartyName"] <- "party"
+#   names(year_data)[names(year_data) == "CandidateVotes"] <- "votes"
+#   year_data$county <- str_to_lower(year_data$county)
+#   year_data$county <- str_squish(year_data$county)
+#   year_data$office[year_data$office == "Governor 4 Year Term (1) Position"] <- "Governor"
+#   year_data$office[year_data$office == "Secretary of State 4 Year Term (1) Position"] <- "Secretary of State"
+#   year_data$office[year_data$office == "Attorney General 4 Year Term (1) Position"] <- "Attorney General"
+#   year_data$district <- str_extract_part()
+#   for (i in year_data) {
+#     year_data$office <- gsub("District Representative in State Legislature 2 Year Term (1)", "Representative", year_data$office)
+#   }
+#
+#   #grp <- grep("District Representative in State Legislature 2 Year Term (1)", year_data$office)
+#   print(unique(year_data$office))
+#   #for (i in )
+# }
+# mi_2022_prep(mi_2022)
+
+
 
 mi_data <- open_elections_factory_mi("mi")
 mi_data <- generate_data(mi_data)
+mi_2022 <- mi_data[[12]]
 contested_mi <- sa_contest_all(mi_data)
 
 ## UNCONTESTED DOES NOT NEED TO BE MODIFIED ANYMORE
@@ -262,7 +334,7 @@ year_baseline_data_mi <- function(year, data) {
 
 efficiency_gap_mi <- function(full_votes, year) { #changed the default table
   mi_sa <- data.frame(Year = c("2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022"),
-                      Total_seats = c(110, 110, 110, 110, 110, 110, 110, 110),
+                      Total_seats = c(110, 110, 110, 110, 110, 110, 110, 1110),
                       Dem_seats = c(67, 46, 51, 47, 47, 52, 52, 56),
                       Rep_seats = c(43, 64, 59, 63, 63, 58, 58, 54)
   )

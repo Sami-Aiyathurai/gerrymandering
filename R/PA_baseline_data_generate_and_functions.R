@@ -72,7 +72,7 @@ ybd2010 <- year_baseline_data_pa(2010, pa_data)
 ## will prob need to make a PA form of precincts_not_found
 
 PAprecincts_not_found <- function(temp, main_year, statewide_main_year, statewide_main_minus_two,
-                                statewide_main_minus_four, dis_name,...) {
+                                  statewide_main_minus_four, dis_name,...) {
   df_org <- main_year %>%
     filter(office != "State House")
   print(head(df_org))
