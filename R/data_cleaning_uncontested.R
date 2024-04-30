@@ -2,7 +2,6 @@
 #' The functions in this file are called within districts_baselin_func.R to create the baselines for uncontested
 #' districts.
 
-
 #' statewide_master is a function that executes smaller functions to find the total votes cast per office,
 #' and the total two-party votes cast per office, for all statewide races in a given year. A two-party vote is
 #' defined as the total votes cast for either the Democrat or Republican parties.
@@ -15,7 +14,6 @@ statewide_master <- function(x) {
   return(x)
 }
 
-
 #' filter_statewide takes the entire state's voting data for a given year and filters it so that only the most
 #' prominent statewide offices are included: Senate, President, Attorney General, Secretary of State, and
 #' Governor. In any given year, there will be some of, but never all, of these races, as they are temporally
@@ -27,7 +25,6 @@ filter_statewide <- function(x) {
              .data[["office"]] == "Secretary of State" | .data[["office"]] == "Governor")
   return(x)
 }
-
 
 
 #' total_vote_func takes the filtered statewide information and finds
@@ -48,7 +45,6 @@ total_2p_vote_func <- function(x) {
   return(x)
 }
 
-
 #' vote_join combines the original data frame and appends the total statewide votes for
 #' all parties and two parties.
 #' @param x data frame created by open_elections_factory and generate_data
@@ -60,8 +56,6 @@ vote_join <- function(x, y, z) {
     left_join(z, by = "office")
   return(x)
 }
-
-
 
 #' check_districts creates an integer vector with the unique number of districts in the year. This is important
 #' for iteration.
@@ -94,7 +88,6 @@ district_func <- function(x, y) { # changed the [] in statewide_x_year
   return(district_x_year)
 }
 
-
 #' Takes in the filtered statewide information and creates a character vector with all of the unique wards within
 #' the specified district. Each district is composed of specified wards, and by taking the unique wards of a
 #' district we can identify across redistricting cycles how voters behaved.
@@ -104,7 +97,6 @@ check_wards <- function(x) {
   uwards <- (unique(x$ward))
   return(uwards)
 }
-
 
 #' candidate_function should only be run on two party races, and summarizes the data to provide vote shares and
 #' proportions for candidates. This allows us to then find average proportions to estimate vote shares.
@@ -118,4 +110,3 @@ candidate_function <- function(x) {
     dplyr::mutate(prop = .data[["cand_total_votes"]]/.data[["total_votes_2p"]])
   return(x)
 }
-

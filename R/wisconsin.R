@@ -8,6 +8,10 @@ library(redist)
 library(geomander)
 library(alarmdata)
 
+wi_2012 <- wi_data[[7]]
+write.csv(wi_2012, "C:\\Users\\mzelloe\\Documents\\wi_2012.csv", row.names=FALSE)
+
+
 ## WISCONSIN
 
 wi_prep <- function(data) {
@@ -328,4 +332,3 @@ efficiency_gap_contested <- function(full_votes, year) {
 #' @return A numeric vector, between -0.25 and 0.25 that estimates how gerrymandered the
 #' state assembly is.
 #'
-

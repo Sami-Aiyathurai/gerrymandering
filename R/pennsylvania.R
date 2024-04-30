@@ -4,6 +4,7 @@ library(berryFunctions)
 library(tidyverse)
 library(stringr)
 library(forstringr)
+library(readxl)
 
 open_elections_factory_pa <- function(state) {
   dates = c("2004"="20041102", "2006"="20061107", "2008"="20081104", "2010"="20101102", "2012"="20121106", "2014"="20141104", "2016"="2016", "2018"="2018", "2020"="2020", "2022"="2022")
@@ -14,39 +15,39 @@ open_elections_factory_pa <- function(state) {
     stop("This package does not have the functionality for state: ", state)
   }
   read <- function(year){
-  date <- dates[year]
-  temp3 <- paste(date,temp2, sep = "")
-  temp4 <- paste("https://www.dos.pa.gov/VotingElections/BEST/stats/Documents/ElectionReturns_",date, "_General_PrecinctReturns.txt", sep="")
+    date <- dates[year]
+    temp3 <- paste(date,temp2, sep = "")
+    temp4 <- paste("https://www.dos.pa.gov/VotingElections/BEST/stats/Documents/ElectionReturns_",date, "_General_PrecinctReturns.txt", sep="")
     url <- file.path(temp1 , year, temp3)
     url2 <- file.path(temp4)
     if (year <= 2014) {
       data <- utils::read.csv(url)
-        if (year == 2004) {
-          data <- pa_2004_function(data)
-          data <- selecting_function(data)
-        }
-        if (year == 2006) {
-          data <- pa_2006_function(data)
-          data <- selecting_function(data)
-        }
-        if (year == 2008) {
-          data <- pa_2008_function(data)
-          data <- selecting_function(data)
-        }
-        if (year == 2010) {
-          data <- pa_2010_function(data)
-          data <- selecting_function(data)
-        }
-        if (year == 2012) {
-          data <- pa_2012_function(data)
-          data <- selecting_function(data)
-          data <- filter_2012(data)
-        }
-        if (year == 2014) {
-          data <- pa_2014_function(data)
-          data <- selecting_function(data)
-          data <- filter_2014(data)
-        }
+      if (year == 2004) {
+        data <- pa_2004_function(data)
+        data <- selecting_function(data)
+      }
+      if (year == 2006) {
+        data <- pa_2006_function(data)
+        data <- selecting_function(data)
+      }
+      if (year == 2008) {
+        data <- pa_2008_function(data)
+        data <- selecting_function(data)
+      }
+      if (year == 2010) {
+        data <- pa_2010_function(data)
+        data <- selecting_function(data)
+      }
+      if (year == 2012) {
+        data <- pa_2012_function(data)
+        data <- selecting_function(data)
+        data <- filter_2012(data)
+      }
+      if (year == 2014) {
+        data <- pa_2014_function(data)
+        data <- selecting_function(data)
+        data <- filter_2014(data)
+      }
     }
     if (year >= 2016) {
       data <- utils::read.csv(url2)
@@ -156,7 +157,6 @@ pa_2004_function <- function(pa_year) {
   return(mod_year)
 }
 
-
 ## 2006
 
 pa_2006 <- pa_data[[4]]
@@ -265,7 +265,7 @@ pa_2008_function <- function(pa_year) {
                                mod_year$other_mun_identifier, sep=" ")
   }
 
- # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
   mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
@@ -586,7 +586,7 @@ pa_2018_function <- function(pa_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
     mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
   }
- # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
   mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
@@ -647,10 +647,10 @@ pa_2020_function <- function(pa_year) {
   mod_year$year <- as.numeric(mod_year$year)
   mod_year$candidate <- as.character(179507)
   for (row in mod_year) {
-     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
-     mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
-   }
- # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+    mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
+    mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
+  }
+  # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
   mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
@@ -715,7 +715,7 @@ pa_2022_function <- function(pa_year) {
     mod_year$candidate <- paste(mod_year$first_name, mod_year$last_name, sep=" ")
     mod_year$precinct <- paste(mod_year$municipality_name, sep=" ")
   }
- # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
+  # mod_year$precinct <- str_replace_all(string=mod_year$precinct, pattern=" ", repl="")
   mod_year$cw_concat <- paste(mod_year$county_code, mod_year$precinct)
   mod_year$contest_dem <- ifelse(mod_year$party == "DEM", 1, 0)
   mod_year$contest_rep <- ifelse(mod_year$party == "REP", 1, 0)
@@ -736,7 +736,7 @@ selecting_function <- function(pa_year) {
   return(pa_year)
 }
 
-## misc
+
 
 
 
@@ -1036,6 +1036,4 @@ pa_2002_function <- function(pa_year) {
 
   return(mod_year)
 }
-
-
 
